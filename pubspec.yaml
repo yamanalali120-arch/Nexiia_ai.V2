@@ -1,0 +1,51 @@
+name: nexiia_app
+description: "Nexiia — Deine futuristische KI-Lifestyle-Assistenz."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.4.0  # Ändere das von 3.11.4 auf mindestens 3.4.0
+
+# ═══════════════════════════════════════════════════
+# DEPENDENCIES
+# ═══════════════════════════════════════════════════
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Auth & Backend
+  supabase_flutter: ^2.8.1
+
+  # Lokale Datenspeicherung
+  shared_preferences: ^2.3.4
+
+  # iOS-Style Icons (falls benötigt)
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+# ═══════════════════════════════════════════════════
+# FLUTTER KONFIGURATION
+# ═══════════════════════════════════════════════════
+
+flutter:
+  uses-material-design: true
+
+  # ─── Satoshi Font Familie ─────────────────────────
+  fonts:
+    - family: Satoshi
+      fonts:
+        - asset: assets/fonts/Satoshi-Light.otf
+          weight: 300
+        - asset: assets/fonts/Satoshi-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Satoshi-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Satoshi-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Satoshi-Black.otf
+          weight: 900
