@@ -12,6 +12,11 @@ class NexiiaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       home: const SplashScreen(),
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+        );
+      },
     );
   }
 }

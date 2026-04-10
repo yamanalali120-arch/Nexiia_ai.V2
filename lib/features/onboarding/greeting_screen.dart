@@ -2,6 +2,8 @@
 // NEXIIA — Greeting Screen (Onboarding Step 1)
 // ═══════════════════════════════════════════════════════════════════
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_strings.dart';
@@ -30,14 +32,24 @@ class _GreetingScreenState extends State<GreetingScreen>
   late final AnimationController _line3Controller;
   late final AnimationController _buttonController;
 
+  // Ambient Glow Animation
+  late final AnimationController _ambientGlowController;
+  late final Animation<double> _ambientGlowAnimation;
+
+  // Subtle floating orb
+  late final AnimationController _orbController;
+  late final Animation<Alignment> _orbAlignmentAnimation;
+  late final Animation<double> _orbOpacityAnimation;
+
   // ─── Timing-Konstanten ──────────────────────────────────────
 
-  static const _animDuration = Duration(milliseconds: 500);
+  static const _animDuration = Duration(milliseconds: 600);
   static const _line1Delay = Duration(milliseconds: 600);
   static const _line2Delay = Duration(milliseconds: 1800);
   static const _line3Delay = Duration(milliseconds: 3000);
   static const _buttonDelay = Duration(milliseconds: 4200);
   static const _curve = Curves.easeOutCubic;
+  static const _springCurve = Curves.easeOutBack;
 
   @override
   void initState() {
@@ -57,8 +69,59 @@ class _GreetingScreenState extends State<GreetingScreen>
     );
     _buttonController = AnimationController(
       vsync: this,
-      duration: _animDuration,
+      duration: const Duration(milliseconds: 700),
     );
+
+    // Ambient Glow – sanftes Atmen
+    _ambientGlowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4000),
+    );
+    _ambientGlowAnimation = Tween<double>(
+      begin: 0.03,
+      end: 0.1,
+    ).animate(CurvedAnimation(
+      parent: _ambientGlowController,
+      curve: Curves.easeInOut,
+    ));
+    _ambientGlowController.repeat(reverse: true);
+
+    // Floating Orb
+    _orbController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 8000),
+    );
+    _orbAlignmentAnimation = TweenSequence<Alignment>([
+      TweenSequenceItem(
+        tween: AlignmentTween(
+          begin: const Alignment(-0.8, -0.6),
+          end: const Alignment(0.6, -0.3),
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: AlignmentTween(
+          begin: const Alignment(0.6, -0.3),
+          end: const Alignment(-0.4, -0.8),
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: AlignmentTween(
+          begin: const Alignment(-0.4, -0.8),
+          end: const Alignment(-0.8, -0.6),
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 1,
+      ),
+    ]).animate(_orbController);
+    _orbOpacityAnimation = Tween<double>(
+      begin: 0.04,
+      end: 0.12,
+    ).animate(CurvedAnimation(
+      parent: _orbController,
+      curve: Curves.easeInOut,
+    ));
+    _orbController.repeat();
 
     _startSequence();
   }
@@ -87,6 +150,8 @@ class _GreetingScreenState extends State<GreetingScreen>
     _line2Controller.dispose();
     _line3Controller.dispose();
     _buttonController.dispose();
+    _ambientGlowController.dispose();
+    _orbController.dispose();
     super.dispose();
   }
 
@@ -98,14 +163,15 @@ class _GreetingScreenState extends State<GreetingScreen>
   Widget _buildAnimatedLine({
     required AnimationController controller,
     required Widget child,
+    bool useSpring = false,
   }) {
     final curvedAnimation = CurvedAnimation(
       parent: controller,
-      curve: _curve,
+      curve: useSpring ? _springCurve : _curve,
     );
 
     final offsetAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.08),
+      begin: const Offset(0.0, 0.12),
       end: Offset.zero,
     ).animate(curvedAnimation);
 
@@ -124,58 +190,208 @@ class _GreetingScreenState extends State<GreetingScreen>
       backgroundColor: AppColors.background,
       body: AnimatedGradientBg(
         gradient: AppGradients.backgroundOnboarding,
-        child: SafeArea(
-          child: GestureDetector(
-            onTap: () {
-              if (_buttonController.isCompleted) {
-                _onContinue();
-              }
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Spacer(flex: 3),
-                  _buildAnimatedLine(
-                    controller: _line1Controller,
-                    child: Text(
-                      AppStrings.greetingLine1,
-                      style: AppTypography.greetingPrimary,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_ambientGlowController, _orbController]),
+          builder: (context, child) {
+            return Stack(
+              children: [
+                // ── Floating Ambient Orb ──
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: _orbAlignmentAnimation.value,
+                        radius: 1.0,
+                        colors: [
+                          AppColors.electricBlue
+                              .withValues(alpha: _orbOpacityAnimation.value),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: AppSpacing.smd),
-                  _buildAnimatedLine(
-                    controller: _line2Controller,
-                    child: Text(
-                      AppStrings.greetingLine2,
-                      style: AppTypography.greetingSecondary,
+                ),
+
+                // ── Subtle Center Glow ──
+                Center(
+                  child: Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.electricBlue
+                              .withValues(alpha: _ambientGlowAnimation.value),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: AppSpacing.lg),
-                  _buildAnimatedLine(
-                    controller: _line3Controller,
-                    child: Text(
-                      AppStrings.greetingLine3,
-                      style: AppTypography.greetingTertiary,
+                ),
+
+                child!,
+              ],
+            );
+          },
+          child: SafeArea(
+            child: GestureDetector(
+              onTap: () {
+                if (_buttonController.isCompleted) {
+                  _onContinue();
+                }
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenPadding + 4,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Spacer(flex: 3),
+
+                    // ── Line 1 ──
+                    _buildAnimatedLine(
+                      controller: _line1Controller,
+                      child: Text(
+                        AppStrings.greetingLine1,
+                        style: AppTypography.greetingPrimary.copyWith(
+                          letterSpacing: -0.5,
+                        ),
+                      ),
                     ),
-                  ),
-                  const Spacer(flex: 4),
-                  _buildAnimatedLine(
-                    controller: _buttonController,
-                    child: PremiumButton(
-                      label: AppStrings.greetingContinue,
-                      onPressed: _onContinue,
-                      isExpanded: true,
+
+                    SizedBox(height: AppSpacing.smd + 2),
+
+                    // ── Line 2 ──
+                    _buildAnimatedLine(
+                      controller: _line2Controller,
+                      child: Text(
+                        AppStrings.greetingLine2,
+                        style: AppTypography.greetingSecondary.copyWith(
+                          height: 1.5,
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: AppSpacing.xxl),
-                ],
+
+                    SizedBox(height: AppSpacing.lg + 4),
+
+                    // ── Line 3 mit Glass-Container ──
+                    _buildAnimatedLine(
+                      controller: _line3Controller,
+                      child: _buildGlassQuote(),
+                    ),
+
+                    const Spacer(flex: 4),
+
+                    // ── Button mit Spring-Animation ──
+                    _buildAnimatedLine(
+                      controller: _buttonController,
+                      useSpring: true,
+                      child: PremiumButton(
+                        label: AppStrings.greetingContinue,
+                        onPressed: _onContinue,
+                        isExpanded: true,
+                      ),
+                    ),
+
+                    SizedBox(height: AppSpacing.xxl + 8),
+                  ],
+                ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ───────────────────────────────────────────────
+  // GLASS QUOTE CONTAINER
+  // ───────────────────────────────────────────────
+
+  Widget _buildGlassQuote() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md + 4,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            color: Colors.white.withValues(alpha: 0.04),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 0.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Top Reflection Line
+              Positioned(
+                top: 0,
+                left: 16,
+                right: 16,
+                child: Container(
+                  height: 0.5,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Quote Content
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Accent Line
+                  Container(
+                    width: 2,
+                    height: 40,
+                    margin: EdgeInsets.only(right: AppSpacing.md),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(1),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.electricBlue.withValues(alpha: 0.8),
+                          AppColors.electricBlue.withValues(alpha: 0.1),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      AppStrings.greetingLine3,
+                      style: AppTypography.greetingTertiary.copyWith(
+                        color: AppColors.white80.withValues(alpha: 0.55),
+                        height: 1.5,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

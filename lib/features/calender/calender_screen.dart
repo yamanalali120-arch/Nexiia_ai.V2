@@ -1,20 +1,16 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// NEXIIA HORIZON CALENDAR — Liquid Glass Edition v5
-// Datei: lib/features/calender/calendar_screen.dart
-// iOS 26 Liquid Glass · Transparent · Floating · Animated · Editable
-// ═══════════════════════════════════════════════════════════════════════════════
-
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/services/user_preferences.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ENUMS & CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 enum _CalView { day, week }
+
 enum _SmartLayer { focus, energy, recovery, buffer, free }
 
 const double _kHourH = 76.0;
@@ -25,31 +21,46 @@ const int _kTotal = _kEnd - _kStart;
 extension _SmartLayerX on _SmartLayer {
   String get label {
     switch (this) {
-      case _SmartLayer.focus: return 'Fokus';
-      case _SmartLayer.energy: return 'Energie';
-      case _SmartLayer.recovery: return 'Recovery';
-      case _SmartLayer.buffer: return 'Puffer';
-      case _SmartLayer.free: return 'Freie Zeit';
+      case _SmartLayer.focus:
+        return 'Fokus';
+      case _SmartLayer.energy:
+        return 'Energie';
+      case _SmartLayer.recovery:
+        return 'Recovery';
+      case _SmartLayer.buffer:
+        return 'Puffer';
+      case _SmartLayer.free:
+        return 'Freie Zeit';
     }
   }
 
   IconData get icon {
     switch (this) {
-      case _SmartLayer.focus: return Icons.center_focus_strong_rounded;
-      case _SmartLayer.energy: return Icons.bolt_rounded;
-      case _SmartLayer.recovery: return Icons.self_improvement_rounded;
-      case _SmartLayer.buffer: return Icons.hourglass_top_rounded;
-      case _SmartLayer.free: return Icons.wb_sunny_outlined;
+      case _SmartLayer.focus:
+        return Icons.center_focus_strong_rounded;
+      case _SmartLayer.energy:
+        return Icons.bolt_rounded;
+      case _SmartLayer.recovery:
+        return Icons.self_improvement_rounded;
+      case _SmartLayer.buffer:
+        return Icons.hourglass_top_rounded;
+      case _SmartLayer.free:
+        return Icons.wb_sunny_outlined;
     }
   }
 
   Color get color {
     switch (this) {
-      case _SmartLayer.focus: return const Color(0xFF3478F6);
-      case _SmartLayer.energy: return const Color(0xFF60A5FA);
-      case _SmartLayer.recovery: return const Color(0xFF30A46C);
-      case _SmartLayer.buffer: return const Color(0xFFD4A853);
-      case _SmartLayer.free: return const Color(0xFF34D399);
+      case _SmartLayer.focus:
+        return const Color(0xFF3478F6);
+      case _SmartLayer.energy:
+        return const Color(0xFF60A5FA);
+      case _SmartLayer.recovery:
+        return const Color(0xFF30A46C);
+      case _SmartLayer.buffer:
+        return const Color(0xFFD4A853);
+      case _SmartLayer.free:
+        return const Color(0xFF34D399);
     }
   }
 }
@@ -84,9 +95,15 @@ class NexiiaEvent {
   int get durationMinutes => end.difference(start).inMinutes;
 
   NexiiaEvent copy() => NexiiaEvent(
-        id: id, title: title, subtitle: subtitle, location: location,
-        start: start, end: end, color: color,
-        energyLevel: energyLevel, isAiSuggested: isAiSuggested,
+        id: id,
+        title: title,
+        subtitle: subtitle,
+        location: location,
+        start: start,
+        end: end,
+        color: color,
+        energyLevel: energyLevel,
+        isAiSuggested: isAiSuggested,
       );
 }
 
@@ -94,38 +111,78 @@ List<NexiiaEvent> _buildMockEvents() {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   return [
-    NexiiaEvent(id: '1', title: 'Team Standup', subtitle: 'Mit Felix & Sarah',
-      location: 'Zoom', start: today.add(const Duration(hours: 9)),
-      end: today.add(const Duration(hours: 9, minutes: 30)), color: const Color(0xFF818CF8)),
-    NexiiaEvent(id: '2', title: 'Deep Work – Nexiia UI', subtitle: 'Kein Slack, kein Mail',
-      start: today.add(const Duration(hours: 10)), end: today.add(const Duration(hours: 12)),
-      color: const Color(0xFF60A5FA), energyLevel: 0.85),
-    NexiiaEvent(id: '3', title: 'Mittagspause',
-      start: today.add(const Duration(hours: 12)), end: today.add(const Duration(hours: 13)),
-      color: const Color(0xFF34D399)),
-    NexiiaEvent(id: '4', title: 'Investor Call', subtitle: 'Series A Vorbereitung',
-      location: 'Konferenzraum B', start: today.add(const Duration(hours: 14)),
-      end: today.add(const Duration(hours: 15)), color: const Color(0xFFF59E0B), energyLevel: 0.95),
-    NexiiaEvent(id: '5', title: 'Fokusblock · KI', subtitle: 'Von Nexiia vorgeschlagen',
-      start: today.add(const Duration(hours: 16)),
-      end: today.add(const Duration(hours: 17, minutes: 30)),
-      color: const Color(0xFF60A5FA), energyLevel: 0.7, isAiSuggested: true),
-    NexiiaEvent(id: '6', title: 'Design Review', subtitle: 'Figma Walkthrough',
-      start: today.add(const Duration(days: 1, hours: 10)),
-      end: today.add(const Duration(days: 1, hours: 11)), color: const Color(0xFFA78BFA)),
-    NexiiaEvent(id: '7', title: 'Sprint Planning',
-      start: today.add(const Duration(days: 2, hours: 9)),
-      end: today.add(const Duration(days: 2, hours: 11)), color: const Color(0xFFF87171)),
-    NexiiaEvent(id: '8', title: 'User Research',
-      start: today.add(const Duration(days: 3, hours: 14)),
-      end: today.add(const Duration(days: 3, hours: 16)), color: const Color(0xFF34D399)),
-    NexiiaEvent(id: '9', title: 'Weekly Review',
-      start: today.add(const Duration(days: 4, hours: 17)),
-      end: today.add(const Duration(days: 4, hours: 18)),
-      color: const Color(0xFF60A5FA), energyLevel: 0.5),
-    NexiiaEvent(id: '10', title: 'Boxtraining',
-      start: today.add(const Duration(days: 3, hours: 18)),
-      end: today.add(const Duration(days: 3, hours: 19)), color: const Color(0xFFF87171)),
+    NexiiaEvent(
+        id: '1',
+        title: 'Team Standup',
+        subtitle: 'Mit Felix & Sarah',
+        location: 'Zoom',
+        start: today.add(const Duration(hours: 9)),
+        end: today.add(const Duration(hours: 9, minutes: 30)),
+        color: const Color(0xFF818CF8)),
+    NexiiaEvent(
+        id: '2',
+        title: 'Deep Work – Nexiia UI',
+        subtitle: 'Kein Slack, kein Mail',
+        start: today.add(const Duration(hours: 10)),
+        end: today.add(const Duration(hours: 12)),
+        color: const Color(0xFF60A5FA),
+        energyLevel: 0.85),
+    NexiiaEvent(
+        id: '3',
+        title: 'Mittagspause',
+        start: today.add(const Duration(hours: 12)),
+        end: today.add(const Duration(hours: 13)),
+        color: const Color(0xFF34D399)),
+    NexiiaEvent(
+        id: '4',
+        title: 'Investor Call',
+        subtitle: 'Series A Vorbereitung',
+        location: 'Konferenzraum B',
+        start: today.add(const Duration(hours: 14)),
+        end: today.add(const Duration(hours: 15)),
+        color: const Color(0xFFF59E0B),
+        energyLevel: 0.95),
+    NexiiaEvent(
+        id: '5',
+        title: 'Fokusblock · KI',
+        subtitle: 'Von Nexiia vorgeschlagen',
+        start: today.add(const Duration(hours: 16)),
+        end: today.add(const Duration(hours: 17, minutes: 30)),
+        color: const Color(0xFF60A5FA),
+        energyLevel: 0.7,
+        isAiSuggested: true),
+    NexiiaEvent(
+        id: '6',
+        title: 'Design Review',
+        subtitle: 'Figma Walkthrough',
+        start: today.add(const Duration(days: 1, hours: 10)),
+        end: today.add(const Duration(days: 1, hours: 11)),
+        color: const Color(0xFFA78BFA)),
+    NexiiaEvent(
+        id: '7',
+        title: 'Sprint Planning',
+        start: today.add(const Duration(days: 2, hours: 9)),
+        end: today.add(const Duration(days: 2, hours: 11)),
+        color: const Color(0xFFF87171)),
+    NexiiaEvent(
+        id: '8',
+        title: 'User Research',
+        start: today.add(const Duration(days: 3, hours: 14)),
+        end: today.add(const Duration(days: 3, hours: 16)),
+        color: const Color(0xFF34D399)),
+    NexiiaEvent(
+        id: '9',
+        title: 'Weekly Review',
+        start: today.add(const Duration(days: 4, hours: 17)),
+        end: today.add(const Duration(days: 4, hours: 18)),
+        color: const Color(0xFF60A5FA),
+        energyLevel: 0.5),
+    NexiiaEvent(
+        id: '10',
+        title: 'Boxtraining',
+        start: today.add(const Duration(days: 3, hours: 18)),
+        end: today.add(const Duration(days: 3, hours: 19)),
+        color: const Color(0xFFF87171)),
   ];
 }
 
@@ -133,12 +190,18 @@ String _fmtTime(DateTime dt) =>
     '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
 const List<Color> _kEventColors = [
-  Color(0xFF818CF8), Color(0xFF60A5FA), Color(0xFF34D399), Color(0xFFF59E0B),
-  Color(0xFFF87171), Color(0xFFA78BFA), Color(0xFFFB7DA8), Color(0xFF06B6D4),
+  Color(0xFF818CF8),
+  Color(0xFF60A5FA),
+  Color(0xFF34D399),
+  Color(0xFFF59E0B),
+  Color(0xFFF87171),
+  Color(0xFFA78BFA),
+  Color(0xFFFB7DA8),
+  Color(0xFF06B6D4),
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// LIQUID GLASS — Reusable iOS 26 Base Widget
+// LIQUID GLASS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _LiquidGlass extends StatelessWidget {
@@ -166,15 +229,15 @@ class _LiquidGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cb = blur.clamp(0.0, 30.0);
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        filter: ImageFilter.blur(sigmaX: cb, sigmaY: cb),
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),
-            // iOS 26 Glass Gradient: brighter at top, fades down
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -190,14 +253,12 @@ class _LiquidGlass extends StatelessWidget {
               width: 0.5,
             ),
             boxShadow: [
-              // Outer depth
               BoxShadow(
                 color: Colors.black.withOpacity(0.14),
                 blurRadius: 32,
                 offset: const Offset(0, 10),
                 spreadRadius: -8,
               ),
-              // Color glow
               if (glowColor != null)
                 BoxShadow(
                   color: glowColor!.withOpacity(glowOpacity),
@@ -205,21 +266,15 @@ class _LiquidGlass extends StatelessWidget {
                   spreadRadius: -6,
                   offset: const Offset(0, 6),
                 ),
-              // Inner top light
-              BoxShadow(
-                color: Colors.white.withOpacity(0.04),
-                blurRadius: 6,
-                offset: const Offset(0, -1),
-                spreadRadius: -2,
-              ),
             ],
           ),
           child: Stack(
             children: [
-              // Specular highlight — thin light line at top edge
               if (showSpecularHighlight)
                 Positioned(
-                  top: 0, left: 0, right: 0,
+                  top: 0,
+                  left: 0,
+                  right: 0,
                   child: Container(
                     height: 1.0,
                     decoration: BoxDecoration(
@@ -250,6 +305,165 @@ class _LiquidGlass extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// AMBIENT BACKGROUND
+// ═══════════════════════════════════════════════════════════════════════════════
+
+class _AmbientBackground extends StatelessWidget {
+  final AnimationController ctrl;
+  final Color pri;
+  final Color priLight;
+
+  const _AmbientBackground({
+    required this.ctrl,
+    required this.pri,
+    required this.priLight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: ctrl,
+      builder: (_, __) => CustomPaint(
+        painter: _AmbientPainter(t: ctrl.value, pri: pri, priLight: priLight),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class _AmbientPainter extends CustomPainter {
+  final double t;
+  final Color pri;
+  final Color priLight;
+
+  const _AmbientPainter({
+    required this.t,
+    required this.pri,
+    required this.priLight,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF070B1A), Color(0xFF0B0E1A), Color(0xFF080C1E)],
+          ).createShader(r));
+
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center:
+                Alignment(-0.5 + t * 0.15, -0.5 + math.sin(t * math.pi) * 0.08),
+            radius: 0.9,
+            colors: [pri.withOpacity(0.16 + t * 0.07), Colors.transparent],
+          ).createShader(r));
+
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center:
+                Alignment(0.65 + math.cos(t * math.pi) * 0.1, 0.6 + t * 0.06),
+            radius: 0.7,
+            colors: [priLight.withOpacity(0.12 + t * 0.05), Colors.transparent],
+          ).createShader(r));
+
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: Alignment(0.4, -0.1 + math.sin(t * math.pi * 1.3) * 0.12),
+            radius: 0.55,
+            colors: [pri.withOpacity(0.08 + t * 0.04), Colors.transparent],
+          ).createShader(r));
+
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: Alignment(-0.6, 0.75 + math.cos(t * math.pi * 0.8) * 0.06),
+            radius: 0.5,
+            colors: [priLight.withOpacity(0.06 + t * 0.03), Colors.transparent],
+          ).createShader(r));
+
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: const Alignment(0.7, -0.65),
+            radius: 0.45,
+            colors: [pri.withOpacity(0.05 + t * 0.03), Colors.transparent],
+          ).createShader(r));
+
+    final hy = size.height * 0.38 + math.sin(t * math.pi) * 6;
+    canvas.drawLine(
+      Offset(0, hy),
+      Offset(size.width, hy),
+      Paint()
+        ..shader = LinearGradient(
+          colors: [
+            Colors.transparent,
+            pri.withOpacity(0.28 + t * 0.14),
+            pri.withOpacity(0.42 + t * 0.16),
+            pri.withOpacity(0.28 + t * 0.14),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
+        ).createShader(Rect.fromLTWH(0, hy - 1, size.width, 2))
+        ..strokeWidth = 0.8
+        ..style = PaintingStyle.stroke,
+    );
+
+    canvas.drawRect(
+      Rect.fromLTWH(0, hy - 80, size.width, 160),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            pri.withOpacity(0.05 + t * 0.03),
+            Colors.transparent,
+          ],
+        ).createShader(Rect.fromLTWH(0, hy - 80, size.width, 160)),
+    );
+
+    final rng = math.Random(42);
+    final pColors = [
+      priLight,
+      pri,
+      priLight.withOpacity(0.8),
+      pri.withOpacity(0.7)
+    ];
+    for (int i = 0; i < 28; i++) {
+      final px = rng.nextDouble() * size.width;
+      final baseY = rng.nextDouble() * size.height;
+      final speed = 0.12 + rng.nextDouble() * 0.4;
+      var py = (baseY - t * size.height * speed) % size.height;
+      if (py < 0) py += size.height;
+      canvas.drawCircle(
+        Offset(px, py),
+        0.4 + rng.nextDouble() * 1.2,
+        Paint()
+          ..color = pColors[i % pColors.length]
+              .withOpacity(0.04 + rng.nextDouble() * 0.09)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_AmbientPainter old) => old.t != t || old.pri != pri;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ROOT WIDGET
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -268,6 +482,8 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
   late final AnimationController _entryCtrl;
   late final AnimationController _fabCtrl;
   late final ScrollController _dayScroll;
+  late Color _pri;
+  late Color _priLight;
 
   _CalView _view = _CalView.day;
   int _dayOffset = 0;
@@ -283,17 +499,25 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
   @override
   void initState() {
     super.initState();
-    _ambientCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 7))
+    final atmo = UserPreferences.getAtmosphere();
+    _pri = atmo.colors.primary;
+    _priLight = atmo.colors.secondary;
+    _ambientCtrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 7))
+          ..repeat(reverse: true);
+    _orbBreathCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2200))
       ..repeat(reverse: true);
-    _orbBreathCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200))
+    _voiceWaveCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 800));
+    _nowPulseCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1600))
       ..repeat(reverse: true);
-    _voiceWaveCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-    _nowPulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600))
-      ..repeat(reverse: true);
-    _entryCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-    _fabCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _entryCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 900));
+    _fabCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 600));
     _dayScroll = ScrollController();
-
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
         _entryCtrl.forward();
@@ -309,8 +533,12 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
 
   @override
   void dispose() {
-    _ambientCtrl.dispose(); _orbBreathCtrl.dispose(); _voiceWaveCtrl.dispose();
-    _nowPulseCtrl.dispose(); _entryCtrl.dispose(); _fabCtrl.dispose();
+    _ambientCtrl.dispose();
+    _orbBreathCtrl.dispose();
+    _voiceWaveCtrl.dispose();
+    _nowPulseCtrl.dispose();
+    _entryCtrl.dispose();
+    _fabCtrl.dispose();
     _dayScroll.dispose();
     super.dispose();
   }
@@ -318,10 +546,12 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
   void _scrollToNow() {
     if (!_dayScroll.hasClients) return;
     final now = TimeOfDay.now();
-    final raw = (now.hour - _kStart) * _kHourH + now.minute * (_kHourH / 60.0) - 180.0;
+    final raw =
+        (now.hour - _kStart) * _kHourH + now.minute * (_kHourH / 60.0) - 180.0;
     _dayScroll.animateTo(
       raw.clamp(0.0, _dayScroll.position.maxScrollExtent).toDouble(),
-      duration: const Duration(milliseconds: 650), curve: Curves.easeOutCubic,
+      duration: const Duration(milliseconds: 650),
+      curve: Curves.easeOutCubic,
     );
   }
 
@@ -335,8 +565,12 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
     HapticFeedback.mediumImpact();
     final next = !_voiceActive;
     setState(() {
-      _voiceActive = next; _voiceListen = next;
-      if (!next) { _showAiCard = false; _aiCardText = ''; }
+      _voiceActive = next;
+      _voiceListen = next;
+      if (!next) {
+        _showAiCard = false;
+        _aiCardText = '';
+      }
     });
     if (next) {
       _voiceWaveCtrl.repeat();
@@ -345,8 +579,8 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
         _voiceWaveCtrl.stop();
         setState(() {
           _voiceListen = false;
-          _aiCardText = 'Du hast um 15:00 Uhr einen freien Block. '
-              'Soll ich dort eine 90-minütige Fokuszeit einplanen?';
+          _aiCardText =
+              'Du hast um 15:00 Uhr einen freien Block. Soll ich dort eine 90-minütige Fokuszeit einplanen?';
           _showAiCard = true;
         });
       });
@@ -357,28 +591,33 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
 
   List<NexiiaEvent> _eventsFor(int offset) {
     final t = DateTime.now().add(Duration(days: offset));
-    return _events.where((e) =>
-      e.start.year == t.year && e.start.month == t.month && e.start.day == t.day
-    ).toList()..sort((a, b) => a.start.compareTo(b.start));
+    return _events
+        .where((e) =>
+            e.start.year == t.year &&
+            e.start.month == t.month &&
+            e.start.day == t.day)
+        .toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
   }
 
   List<NexiiaEvent> get _weekEvents {
     final now = DateTime.now();
-    final monday = now.subtract(Duration(days: now.weekday - 1));
-    final sunday = monday.add(const Duration(days: 7));
-    return _events.where((e) => !e.start.isBefore(monday) && e.start.isBefore(sunday))
-        .toList()..sort((a, b) => a.start.compareTo(b.start));
+    final mon = now.subtract(Duration(days: now.weekday - 1));
+    final sun = mon.add(const Duration(days: 7));
+    return _events
+        .where((e) => !e.start.isBefore(mon) && e.start.isBefore(sun))
+        .toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
   }
 
   int _freeSlots(List<NexiiaEvent> evts) {
-    int free = 0;
+    int f = 0;
     for (int h = 8; h < 20; h++) {
-      if (!evts.any((e) => e.start.hour <= h && e.end.hour > h)) free++;
+      if (!evts.any((e) => e.start.hour <= h && e.end.hour > h)) f++;
     }
-    return (free / 2).round().clamp(1, 8);
+    return (f / 2).round().clamp(1, 8);
   }
 
-  // ── CRUD ──
   void _addEvent({DateTime? presetStart}) {
     HapticFeedback.mediumImpact();
     final now = DateTime.now();
@@ -386,24 +625,39 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
     final start = presetStart ?? day.add(Duration(hours: now.hour + 1));
     final end = start.add(const Duration(hours: 1));
     final newEvt = NexiiaEvent(
-      id: '${_nextId++}', title: 'Neuer Termin', start: start, end: end,
+      id: '${_nextId++}',
+      title: 'Neuer Termin',
+      start: start,
+      end: end,
       color: _kEventColors[math.Random().nextInt(_kEventColors.length)],
     );
-    setState(() { _events.add(newEvt); _selectedEvent = newEvt; });
+    setState(() {
+      _events.add(newEvt);
+      _selectedEvent = newEvt;
+    });
   }
 
   void _deleteEvent(NexiiaEvent e) {
     HapticFeedback.heavyImpact();
-    setState(() { _events.removeWhere((ev) => ev.id == e.id); _selectedEvent = null; });
+    setState(() {
+      _events.removeWhere((ev) => ev.id == e.id);
+      _selectedEvent = null;
+    });
   }
 
   void _duplicateEvent(NexiiaEvent e) {
     HapticFeedback.mediumImpact();
     setState(() {
       _events.add(NexiiaEvent(
-        id: '${_nextId++}', title: e.title, subtitle: e.subtitle, location: e.location,
-        start: e.start.add(const Duration(days: 1)), end: e.end.add(const Duration(days: 1)),
-        color: e.color, energyLevel: e.energyLevel, isAiSuggested: false,
+        id: '${_nextId++}',
+        title: e.title,
+        subtitle: e.subtitle,
+        location: e.location,
+        start: e.start.add(const Duration(days: 1)),
+        end: e.end.add(const Duration(days: 1)),
+        color: e.color,
+        energyLevel: e.energyLevel,
+        isAiSuggested: false,
       ));
     });
   }
@@ -416,22 +670,35 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
       color: const Color(0xFF141420).withOpacity(0.92),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       items: [
-        _ctxItem('edit', Icons.edit_outlined, 'Bearbeiten', AppColors.electricBlueLight),
-        _ctxItem('dup', Icons.copy_rounded, 'Duplizieren', AppColors.electricBlueLight),
-        _ctxItem('del', Icons.delete_outline_rounded, 'Löschen', AppColors.error),
+        _ctxItem('edit', Icons.edit_outlined, 'Bearbeiten', _priLight),
+        _ctxItem('dup', Icons.copy_rounded, 'Duplizieren', _priLight),
+        _ctxItem(
+            'del', Icons.delete_outline_rounded, 'Löschen', AppColors.error),
       ],
     ).then((v) {
-      if (v == 'edit') setState(() => _selectedEvent = event);
-      else if (v == 'dup') _duplicateEvent(event);
+      if (v == 'edit')
+        setState(() => _selectedEvent = event);
+      else if (v == 'dup')
+        _duplicateEvent(event);
       else if (v == 'del') _deleteEvent(event);
     });
   }
 
-  PopupMenuItem<String> _ctxItem(String val, IconData ic, String lbl, Color c) =>
-      PopupMenuItem(value: val, child: Row(children: [
-        Icon(ic, size: 16, color: c), const SizedBox(width: 10),
-        Text(lbl, style: TextStyle(fontFamily: 'Satoshi', fontSize: 13, fontWeight: FontWeight.w500, color: c)),
-      ]));
+  PopupMenuItem<String> _ctxItem(String val, IconData ic, String lbl, Color c) {
+    return PopupMenuItem(
+      value: val,
+      child: Row(children: [
+        Icon(ic, size: 16, color: c),
+        const SizedBox(width: 10),
+        Text(lbl,
+            style: TextStyle(
+                fontFamily: 'Satoshi',
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: c)),
+      ]),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -445,28 +712,51 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          _AmbientBackground(ctrl: _ambientCtrl),
+          _AmbientBackground(
+              ctrl: _ambientCtrl, pri: _pri, priLight: _priLight),
 
           FadeTransition(
-            opacity: CurvedAnimation(parent: _entryCtrl, curve: Curves.easeOutCubic),
+            opacity:
+                CurvedAnimation(parent: _entryCtrl, curve: Curves.easeOutCubic),
             child: SlideTransition(
-              position: Tween<Offset>(begin: const Offset(0, 0.015), end: Offset.zero)
-                  .animate(CurvedAnimation(parent: _entryCtrl, curve: Curves.easeOutCubic)),
+              position:
+                  Tween<Offset>(begin: const Offset(0, 0.015), end: Offset.zero)
+                      .animate(CurvedAnimation(
+                          parent: _entryCtrl, curve: Curves.easeOutCubic)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: topPad + 8),
                   _SmartHeader(
-                    dayOffset: _dayOffset, events: todayEvts, freeSlots: _freeSlots(todayEvts),
+                    dayOffset: _dayOffset,
+                    events: todayEvts,
+                    freeSlots: _freeSlots(todayEvts),
                     ambientCtrl: _ambientCtrl,
-                    onPrev: () { setState(() => _dayOffset--); _postScroll(); },
-                    onNext: () { setState(() => _dayOffset++); _postScroll(); },
-                    onToday: () { setState(() => _dayOffset = 0); _postScroll(); },
+                    pri: _pri,
+                    priLight: _priLight,
+                    onPrev: () {
+                      setState(() => _dayOffset--);
+                      _postScroll();
+                    },
+                    onNext: () {
+                      setState(() => _dayOffset++);
+                      _postScroll();
+                    },
+                    onToday: () {
+                      setState(() => _dayOffset = 0);
+                      _postScroll();
+                    },
                   ),
                   const SizedBox(height: 10),
-                  _ViewToggle(current: _view, onChange: _switchView),
+                  _ViewToggle(
+                      current: _view,
+                      onChange: _switchView,
+                      pri: _pri,
+                      priLight: _priLight),
                   const SizedBox(height: 8),
-                  _SmartLayerChips(current: _smartLayer, onChange: (v) => setState(() => _smartLayer = v)),
+                  _SmartLayerChips(
+                      current: _smartLayer,
+                      onChange: (v) => setState(() => _smartLayer = v)),
                   const SizedBox(height: 6),
                   Expanded(
                     child: AnimatedSwitcher(
@@ -476,25 +766,51 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
                       transitionBuilder: (child, anim) => FadeTransition(
                         opacity: anim,
                         child: SlideTransition(
-                          position: Tween<Offset>(begin: const Offset(0.04, 0), end: Offset.zero).animate(anim),
+                          position: Tween<Offset>(
+                                  begin: const Offset(0.04, 0),
+                                  end: Offset.zero)
+                              .animate(anim),
                           child: child,
                         ),
                       ),
                       child: _view == _CalView.day
                           ? _DayView(
                               key: ValueKey('day_$_dayOffset'),
-                              events: todayEvts, scrollCtrl: _dayScroll, nowPulseCtrl: _nowPulseCtrl,
-                              smartLayer: _smartLayer, dayOffset: _dayOffset, bottomPad: botPad,
-                              onEventTap: (e) { HapticFeedback.lightImpact(); setState(() => _selectedEvent = e); },
+                              events: todayEvts,
+                              scrollCtrl: _dayScroll,
+                              nowPulseCtrl: _nowPulseCtrl,
+                              smartLayer: _smartLayer,
+                              dayOffset: _dayOffset,
+                              bottomPad: botPad,
+                              pri: _pri,
+                              priLight: _priLight,
+                              onEventTap: (e) {
+                                HapticFeedback.lightImpact();
+                                setState(() => _selectedEvent = e);
+                              },
                               onEventLongPress: _showCtxMenu,
-                              onSlotTap: (h) => _addEvent(presetStart: DateTime(
-                                DateTime.now().year, DateTime.now().month, DateTime.now().day + _dayOffset, h)),
+                              onSlotTap: (h) => _addEvent(
+                                presetStart: DateTime(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day + _dayOffset,
+                                    h),
+                              ),
                             )
                           : _WeekView(
                               key: const ValueKey('week'),
-                              allEvents: _events, weekEvents: _weekEvents,
-                              selectedOffset: _dayOffset, bottomPad: botPad,
-                              onDayTap: (o) { setState(() { _dayOffset = o; _switchView(_CalView.day); }); },
+                              allEvents: _events,
+                              weekEvents: _weekEvents,
+                              selectedOffset: _dayOffset,
+                              bottomPad: botPad,
+                              pri: _pri,
+                              priLight: _priLight,
+                              onDayTap: (o) {
+                                setState(() {
+                                  _dayOffset = o;
+                                  _switchView(_CalView.day);
+                                });
+                              },
                             ),
                     ),
                   ),
@@ -503,51 +819,97 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
             ),
           ),
 
-          // Floating Add Button
+          // FAB
           Positioned(
-            bottom: botPad + 26, left: 20,
+            bottom: botPad + 26,
+            left: 20,
             child: ScaleTransition(
-              scale: CurvedAnimation(parent: _fabCtrl, curve: Curves.elasticOut),
-              child: _FloatingAddButton(onTap: () => _addEvent(), breathCtrl: _orbBreathCtrl),
+              scale:
+                  CurvedAnimation(parent: _fabCtrl, curve: Curves.elasticOut),
+              child: _FloatingAddButton(
+                onTap: () => _addEvent(),
+                breathCtrl: _orbBreathCtrl,
+                pri: _pri,
+                priLight: _priLight,
+              ),
             ),
           ),
 
           // AI Card
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic,
-            bottom: _showAiCard ? botPad + 110.0 : -220.0, left: 20, right: 88,
-            child: _showAiCard ? _AiCard(
-              text: _aiCardText,
-              onAccept: () { setState(() { _showAiCard = false; _voiceActive = false;
-                final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-                _events.add(NexiiaEvent(id: '${_nextId++}', title: 'Fokuszeit', subtitle: 'Von Nexiia geplant',
-                  start: today.add(const Duration(hours: 15)), end: today.add(const Duration(hours: 16, minutes: 30)),
-                  color: AppColors.electricBlue, energyLevel: 0.8, isAiSuggested: true));
-              }); },
-              onDismiss: () => setState(() { _showAiCard = false; _voiceActive = false; }),
-            ) : const SizedBox.shrink(),
+            duration: const Duration(milliseconds: 420),
+            curve: Curves.easeOutCubic,
+            bottom: _showAiCard ? botPad + 110.0 : -220.0,
+            left: 20,
+            right: 88,
+            child: _showAiCard
+                ? _AiCard(
+                    text: _aiCardText,
+                    pri: _pri,
+                    priLight: _priLight,
+                    onAccept: () {
+                      setState(() {
+                        _showAiCard = false;
+                        _voiceActive = false;
+                        final today = DateTime(DateTime.now().year,
+                            DateTime.now().month, DateTime.now().day);
+                        _events.add(NexiiaEvent(
+                          id: '${_nextId++}',
+                          title: 'Fokuszeit',
+                          subtitle: 'Von Nexiia geplant',
+                          start: today.add(const Duration(hours: 15)),
+                          end:
+                              today.add(const Duration(hours: 16, minutes: 30)),
+                          color: _pri,
+                          energyLevel: 0.8,
+                          isAiSuggested: true,
+                        ));
+                      });
+                    },
+                    onDismiss: () => setState(() {
+                      _showAiCard = false;
+                      _voiceActive = false;
+                    }),
+                  )
+                : const SizedBox.shrink(),
           ),
 
           // Voice Orb
           Positioned(
-            bottom: botPad + 26, right: 20,
-            child: _VoiceOrb(isActive: _voiceActive, isListening: _voiceListen,
-              breathCtrl: _orbBreathCtrl, waveCtrl: _voiceWaveCtrl, onTap: _toggleVoice),
+            bottom: botPad + 26,
+            right: 20,
+            child: _VoiceOrb(
+              isActive: _voiceActive,
+              isListening: _voiceListen,
+              breathCtrl: _orbBreathCtrl,
+              waveCtrl: _voiceWaveCtrl,
+              onTap: _toggleVoice,
+              pri: _pri,
+              priLight: _priLight,
+            ),
           ),
 
           // Event Sheet
           if (_selectedEvent != null)
             _EventSheet(
-              event: _selectedEvent!, botPad: botPad,
+              event: _selectedEvent!,
+              botPad: botPad,
+              pri: _pri,
+              priLight: _priLight,
               onClose: () => setState(() => _selectedEvent = null),
               onDelete: () => _deleteEvent(_selectedEvent!),
-              onDuplicate: () { _duplicateEvent(_selectedEvent!); setState(() => _selectedEvent = null); },
-              onSave: (t, s, l) { setState(() {
-                _selectedEvent!.title = t;
-                _selectedEvent!.subtitle = s.isEmpty ? null : s;
-                _selectedEvent!.location = l.isEmpty ? null : l;
-                _selectedEvent = null;
-              }); },
+              onDuplicate: () {
+                _duplicateEvent(_selectedEvent!);
+                setState(() => _selectedEvent = null);
+              },
+              onSave: (t, s, l) {
+                setState(() {
+                  _selectedEvent!.title = t;
+                  _selectedEvent!.subtitle = s.isEmpty ? null : s;
+                  _selectedEvent!.location = l.isEmpty ? null : l;
+                  _selectedEvent = null;
+                });
+              },
             ),
         ],
       ),
@@ -562,118 +924,6 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// AMBIENT BACKGROUND — Enhanced with vivid color islands
-// ═══════════════════════════════════════════════════════════════════════════════
-
-class _AmbientBackground extends StatelessWidget {
-  final AnimationController ctrl;
-  const _AmbientBackground({required this.ctrl});
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: ctrl,
-      builder: (_, __) => CustomPaint(
-        painter: _AmbientPainter(t: ctrl.value),
-        child: const SizedBox.expand(),
-      ),
-    );
-  }
-}
-
-class _AmbientPainter extends CustomPainter {
-  final double t;
-  const _AmbientPainter({required this.t});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final r = Rect.fromLTWH(0, 0, size.width, size.height);
-
-    // Base — slightly warmer for glass contrast
-    canvas.drawRect(r, Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft, end: Alignment.bottomRight,
-        colors: [Color(0xFF070B1A), Color(0xFF0B0E1A), Color(0xFF080C1E)],
-      ).createShader(r));
-
-    // Blue blob top-left
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: Alignment(-0.5 + t * 0.15, -0.5 + math.sin(t * math.pi) * 0.08),
-        radius: 0.9,
-        colors: [AppColors.electricBlue.withOpacity(0.16 + t * 0.07), Colors.transparent],
-      ).createShader(r));
-
-    // Violet blob bottom-right
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: Alignment(0.65 + math.cos(t * math.pi) * 0.1, 0.6 + t * 0.06),
-        radius: 0.7,
-        colors: [const Color(0xFF6366F1).withOpacity(0.12 + t * 0.05), Colors.transparent],
-      ).createShader(r));
-
-    // Cyan blob center-right
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: Alignment(0.4, -0.1 + math.sin(t * math.pi * 1.3) * 0.12),
-        radius: 0.55,
-        colors: [const Color(0xFF06B6D4).withOpacity(0.08 + t * 0.04), Colors.transparent],
-      ).createShader(r));
-
-    // Rose blob bottom-left
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: Alignment(-0.6, 0.75 + math.cos(t * math.pi * 0.8) * 0.06),
-        radius: 0.5,
-        colors: [const Color(0xFFF472B6).withOpacity(0.06 + t * 0.03), Colors.transparent],
-      ).createShader(r));
-
-    // Teal blob top-right
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: const Alignment(0.7, -0.65), radius: 0.45,
-        colors: [const Color(0xFF2DB08A).withOpacity(0.05 + t * 0.03), Colors.transparent],
-      ).createShader(r));
-
-    // Horizon line
-    final hy = size.height * 0.38 + math.sin(t * math.pi) * 6;
-    canvas.drawLine(Offset(0, hy), Offset(size.width, hy), Paint()
-      ..shader = LinearGradient(colors: [
-        Colors.transparent,
-        AppColors.electricBlue.withOpacity(0.28 + t * 0.14),
-        AppColors.electricBlue.withOpacity(0.42 + t * 0.16),
-        AppColors.electricBlue.withOpacity(0.28 + t * 0.14),
-        Colors.transparent,
-      ], stops: const [0.0, 0.2, 0.5, 0.8, 1.0])
-          .createShader(Rect.fromLTWH(0, hy - 1, size.width, 2))
-      ..strokeWidth = 0.8 ..style = PaintingStyle.stroke);
-
-    // Horizon glow
-    canvas.drawRect(Rect.fromLTWH(0, hy - 80, size.width, 160), Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter, end: Alignment.bottomCenter,
-        colors: [Colors.transparent, AppColors.electricBlue.withOpacity(0.05 + t * 0.03), Colors.transparent],
-      ).createShader(Rect.fromLTWH(0, hy - 80, size.width, 160)));
-
-    // Particles
-    final rng = math.Random(42);
-    final pColors = [AppColors.electricBlueLight, const Color(0xFF6366F1), const Color(0xFF06B6D4), const Color(0xFF34D399)];
-    for (int i = 0; i < 28; i++) {
-      final px = rng.nextDouble() * size.width;
-      final baseY = rng.nextDouble() * size.height;
-      final speed = 0.12 + rng.nextDouble() * 0.4;
-      var py = (baseY - t * size.height * speed) % size.height;
-      if (py < 0) py += size.height;
-      canvas.drawCircle(Offset(px, py), 0.4 + rng.nextDouble() * 1.2, Paint()
-        ..color = pColors[i % pColors.length].withOpacity(0.04 + rng.nextDouble() * 0.09)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5));
-    }
-  }
-
-  @override
-  bool shouldRepaint(_AmbientPainter old) => old.t != t;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // SMART HEADER
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -682,19 +932,55 @@ class _SmartHeader extends StatelessWidget {
   final List<NexiiaEvent> events;
   final int freeSlots;
   final AnimationController ambientCtrl;
+  final Color pri;
+  final Color priLight;
   final VoidCallback onPrev, onNext, onToday;
 
   const _SmartHeader({
-    required this.dayOffset, required this.events, required this.freeSlots,
-    required this.ambientCtrl, required this.onPrev, required this.onNext, required this.onToday,
+    required this.dayOffset,
+    required this.events,
+    required this.freeSlots,
+    required this.ambientCtrl,
+    required this.pri,
+    required this.priLight,
+    required this.onPrev,
+    required this.onNext,
+    required this.onToday,
   });
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now().add(Duration(days: dayOffset));
-    const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-    const weekdays = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
-    final dayLabel = dayOffset == 0 ? 'Heute' : dayOffset == 1 ? 'Morgen' : dayOffset == -1 ? 'Gestern' : weekdays[now.weekday - 1];
+    const months = [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember'
+    ];
+    const weekdays = [
+      'Montag',
+      'Dienstag',
+      'Mittwoch',
+      'Donnerstag',
+      'Freitag',
+      'Samstag',
+      'Sonntag'
+    ];
+    final dayLabel = dayOffset == 0
+        ? 'Heute'
+        : dayOffset == 1
+            ? 'Morgen'
+            : dayOffset == -1
+                ? 'Gestern'
+                : weekdays[now.weekday - 1];
     final aiCount = events.where((e) => e.isAiSuggested).length;
 
     return Padding(
@@ -702,45 +988,83 @@ class _SmartHeader extends StatelessWidget {
       child: AnimatedBuilder(
         animation: ambientCtrl,
         builder: (_, child) => _LiquidGlass(
-          borderRadius: 24, blur: 55, fillOpacity: 0.06,
+          borderRadius: 24,
+          blur: 55,
+          fillOpacity: 0.06,
           borderOpacity: 0.12 + ambientCtrl.value * 0.06,
-          glowColor: AppColors.electricBlue, glowOpacity: 0.08 + ambientCtrl.value * 0.05,
+          glowColor: pri,
+          glowOpacity: 0.08 + ambientCtrl.value * 0.05,
           padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
           child: child!,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '${now.day}. ${months[now.month - 1]}',
+                          style: const TextStyle(
+                              fontFamily: 'Satoshi',
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              height: 1.1),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(dayLabel,
+                          style: TextStyle(
+                              fontFamily: 'Satoshi',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: priLight,
+                              letterSpacing: 0.2)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 6,
+                    children: [
+                      if (events.isNotEmpty)
+                        _SummaryChip(
+                            icon: Icons.event_rounded,
+                            label: '${events.length} Termine',
+                            color: pri),
+                      if (aiCount > 0)
+                        _SummaryChip(
+                            icon: Icons.auto_awesome_rounded,
+                            label: '$aiCount KI-Block${aiCount > 1 ? 's' : ''}',
+                            color: priLight),
+                      _SummaryChip(
+                          icon: Icons.wb_sunny_outlined,
+                          label: '$freeSlots freie Slots',
+                          color: AppColors.success),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Flexible(child: Text('${now.day}. ${months[now.month - 1]}',
-                      style: const TextStyle(fontFamily: 'Satoshi', fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1))),
-                    const SizedBox(width: 10),
-                    Text(dayLabel, style: const TextStyle(fontFamily: 'Satoshi', fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.electricBlueLight, letterSpacing: 0.2)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Wrap(spacing: 7, runSpacing: 6, children: [
-                  if (events.isNotEmpty) _SummaryChip(icon: Icons.event_rounded, label: '${events.length} Termine', color: AppColors.electricBlue),
-                  if (aiCount > 0) _SummaryChip(icon: Icons.auto_awesome_rounded, label: '$aiCount KI-Block${aiCount > 1 ? 's' : ''}', color: AppColors.electricBlueLight),
-                  _SummaryChip(icon: Icons.wb_sunny_outlined, label: '$freeSlots freie Slots', color: AppColors.success),
-                ]),
+                _NavBtn(icon: Icons.chevron_left_rounded, onTap: onPrev),
+                const SizedBox(width: 5),
+                _NavBtn(icon: Icons.today_rounded, onTap: onToday),
+                const SizedBox(width: 5),
+                _NavBtn(icon: Icons.chevron_right_rounded, onTap: onNext),
               ],
-            )),
-            const SizedBox(width: 10),
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              _NavBtn(icon: Icons.chevron_left_rounded, onTap: onPrev),
-              const SizedBox(width: 5),
-              _NavBtn(icon: Icons.today_rounded, onTap: onToday),
-              const SizedBox(width: 5),
-              _NavBtn(icon: Icons.chevron_right_rounded, onTap: onNext),
-            ]),
+            ),
           ],
         ),
       ),
@@ -749,138 +1073,214 @@ class _SmartHeader extends StatelessWidget {
 }
 
 class _SummaryChip extends StatelessWidget {
-  final IconData icon; final String label; final Color color;
-  const _SummaryChip({required this.icon, required this.label, required this.color});
+  final IconData icon;
+  final String label;
+  final Color color;
+  const _SummaryChip(
+      {required this.icon, required this.label, required this.color});
+
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: color.withOpacity(0.08),
-            border: Border.all(color: color.withOpacity(0.20), width: 0.5),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 10, color: color),
-            const SizedBox(width: 5),
-            Text(label, style: TextStyle(fontFamily: 'Satoshi', fontSize: 11, fontWeight: FontWeight.w500, color: color)),
-          ]),
-        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: color.withOpacity(0.10),
+        border: Border.all(color: color.withOpacity(0.20), width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 5),
+          Text(label,
+              style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: color)),
+        ],
       ),
     );
   }
 }
 
 class _NavBtn extends StatelessWidget {
-  final IconData icon; final VoidCallback onTap;
+  final IconData icon;
+  final VoidCallback onTap;
   const _NavBtn({required this.icon, required this.onTap});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: _LiquidGlass(
-        borderRadius: 11, blur: 20, fillOpacity: 0.05, borderOpacity: 0.12, showSpecularHighlight: false,
-        child: SizedBox(width: 34, height: 34, child: Center(child: Icon(icon, size: 17, color: Colors.white.withOpacity(0.60)))),
+        borderRadius: 11,
+        blur: 20,
+        fillOpacity: 0.05,
+        borderOpacity: 0.12,
+        showSpecularHighlight: false,
+        child: SizedBox(
+          width: 34,
+          height: 34,
+          child: Center(
+              child:
+                  Icon(icon, size: 17, color: Colors.white.withOpacity(0.60))),
+        ),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// VIEW TOGGLE
+// VIEW TOGGLE + SMART LAYER CHIPS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _ViewToggle extends StatelessWidget {
-  final _CalView current; final ValueChanged<_CalView> onChange;
-  const _ViewToggle({required this.current, required this.onChange});
+  final _CalView current;
+  final ValueChanged<_CalView> onChange;
+  final Color pri;
+  final Color priLight;
+  const _ViewToggle(
+      {required this.current,
+      required this.onChange,
+      required this.pri,
+      required this.priLight});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: _LiquidGlass(
-        borderRadius: 16, blur: 40, fillOpacity: 0.04, borderOpacity: 0.10,
-        child: SizedBox(height: 42, child: Row(
-          children: _CalView.values.map((v) {
-            final sel = v == current;
-            return Expanded(child: GestureDetector(
-              onTap: () => onChange(v),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 280), curve: Curves.easeOutCubic,
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(11),
-                  color: sel ? AppColors.electricBlue.withOpacity(0.14) : Colors.transparent,
-                  border: sel ? Border.all(color: AppColors.electricBlue.withOpacity(0.30), width: 0.5) : null,
-                  boxShadow: sel ? [BoxShadow(color: AppColors.electricBlue.withOpacity(0.12), blurRadius: 16, spreadRadius: -3)] : [],
+        borderRadius: 16,
+        blur: 40,
+        fillOpacity: 0.04,
+        borderOpacity: 0.10,
+        child: SizedBox(
+          height: 42,
+          child: Row(
+            children: _CalView.values.map((v) {
+              final sel = v == current;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onChange(v),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeOutCubic,
+                    margin: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(11),
+                      color: sel ? pri.withOpacity(0.14) : Colors.transparent,
+                      border: sel
+                          ? Border.all(color: pri.withOpacity(0.30), width: 0.5)
+                          : null,
+                      boxShadow: sel
+                          ? [
+                              BoxShadow(
+                                  color: pri.withOpacity(0.12),
+                                  blurRadius: 16,
+                                  spreadRadius: -3)
+                            ]
+                          : [],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      v == _CalView.day ? 'Tag' : 'Woche',
+                      style: TextStyle(
+                        fontFamily: 'Satoshi',
+                        fontSize: 13,
+                        fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
+                        color: sel ? priLight : Colors.white.withOpacity(0.35),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
                 ),
-                alignment: Alignment.center,
-                child: Text(
-                  v == _CalView.day ? 'Tag' : 'Woche',
-                  style: TextStyle(fontFamily: 'Satoshi', fontSize: 13,
-                    fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
-                    color: sel ? AppColors.electricBlueLight : Colors.white.withOpacity(0.35), letterSpacing: 0.2),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SmartLayerChips extends StatelessWidget {
+  final _SmartLayer current;
+  final ValueChanged<_SmartLayer> onChange;
+  const _SmartLayerChips({required this.current, required this.onChange});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 34,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        children: _SmartLayer.values.map((m) {
+          final sel = m == current;
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onChange(m);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: sel
+                      ? m.color.withOpacity(0.12)
+                      : Colors.white.withOpacity(0.04),
+                  border: Border.all(
+                    color: sel
+                        ? m.color.withOpacity(0.30)
+                        : Colors.white.withOpacity(0.07),
+                    width: 0.5,
+                  ),
+                  boxShadow: sel
+                      ? [
+                          BoxShadow(
+                              color: m.color.withOpacity(0.08),
+                              blurRadius: 12,
+                              spreadRadius: -3)
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(m.icon,
+                        size: 11,
+                        color: sel ? m.color : Colors.white.withOpacity(0.32)),
+                    const SizedBox(width: 5),
+                    Text(
+                      m.label,
+                      style: TextStyle(
+                        fontFamily: 'Satoshi',
+                        fontSize: 11,
+                        fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
+                        color: sel ? m.color : Colors.white.withOpacity(0.32),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ));
-          }).toList(),
-        )),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SMART LAYER CHIPS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-class _SmartLayerChips extends StatelessWidget {
-  final _SmartLayer current; final ValueChanged<_SmartLayer> onChange;
-  const _SmartLayerChips({required this.current, required this.onChange});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(height: 34, child: ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      scrollDirection: Axis.horizontal, physics: const BouncingScrollPhysics(),
-      children: _SmartLayer.values.map((m) {
-        final sel = m == current;
-        return GestureDetector(
-          onTap: () { HapticFeedback.selectionClick(); onChange(m); },
-          child: Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 260), curve: Curves.easeOutCubic,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: sel ? m.color.withOpacity(0.10) : Colors.white.withOpacity(0.03),
-                    border: Border.all(color: sel ? m.color.withOpacity(0.30) : Colors.white.withOpacity(0.07), width: 0.5),
-                    boxShadow: sel ? [BoxShadow(color: m.color.withOpacity(0.08), blurRadius: 12, spreadRadius: -3)] : [],
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(m.icon, size: 11, color: sel ? m.color : Colors.white.withOpacity(0.32)),
-                    const SizedBox(width: 5),
-                    Text(m.label, style: TextStyle(fontFamily: 'Satoshi', fontSize: 11,
-                      fontWeight: sel ? FontWeight.w600 : FontWeight.w400,
-                      color: sel ? m.color : Colors.white.withOpacity(0.32))),
-                  ]),
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    ));
-  }
-}// ═══════════════════════════════════════════════════════════════════════════════
-// DAY VIEW — With slot tap + longpress interaction
+// DAY VIEW + HOUR LINE
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _DayView extends StatelessWidget {
@@ -890,8 +1290,10 @@ class _DayView extends StatelessWidget {
   final _SmartLayer smartLayer;
   final int dayOffset;
   final double bottomPad;
+  final Color pri;
+  final Color priLight;
   final ValueChanged<NexiiaEvent> onEventTap;
-  final void Function(NexiiaEvent event, Offset position) onEventLongPress;
+  final void Function(NexiiaEvent, Offset) onEventLongPress;
   final ValueChanged<int> onSlotTap;
 
   const _DayView({
@@ -902,6 +1304,8 @@ class _DayView extends StatelessWidget {
     required this.smartLayer,
     required this.dayOffset,
     required this.bottomPad,
+    required this.pri,
+    required this.priLight,
     required this.onEventTap,
     required this.onEventLongPress,
     required this.onSlotTap,
@@ -912,81 +1316,70 @@ class _DayView extends StatelessWidget {
     final now = TimeOfDay.now();
     final nowPx = dayOffset == 0
         ? ((now.hour - _kStart) * _kHourH + now.minute * (_kHourH / 60.0))
-            .clamp(0.0, (_kTotal * _kHourH))
+            .clamp(0.0, _kTotal * _kHourH)
             .toDouble()
         : -1.0;
-    final totalH = (_kTotal * _kHourH + 80.0);
 
     return SingleChildScrollView(
       controller: scrollCtrl,
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.fromLTRB(20, 4, 20, bottomPad + 120.0),
+      padding: EdgeInsets.fromLTRB(20, 4, 20, bottomPad + 120),
       child: SizedBox(
-        height: totalH,
+        height: _kTotal * _kHourH + 80,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // ── Hour lines with tap zones ──
             ...List.generate(_kTotal, (i) {
-              final hour = _kStart + i;
-              final hasEvent =
-                  events.any((e) => e.start.hour <= hour && e.end.hour > hour);
+              final h = _kStart + i;
+              final has =
+                  events.any((e) => e.start.hour <= h && e.end.hour > h);
               return Positioned(
-                top: (i * _kHourH),
+                top: i * _kHourH,
                 left: 0,
                 right: 0,
                 child: _HourLine(
-                  hour: hour,
-                  isFree: !hasEvent && hour >= 7 && hour <= 21,
-                  onTap: hasEvent ? null : () => onSlotTap(hour),
-                  onLongPress: hasEvent
+                  hour: h,
+                  isFree: !has && h >= 7 && h <= 21,
+                  onTap: has ? null : () => onSlotTap(h),
+                  onLongPress: has
                       ? null
                       : () {
                           HapticFeedback.mediumImpact();
-                          onSlotTap(hour);
+                          onSlotTap(h);
                         },
                 ),
               );
             }),
-
-            // ── Layer overlays ──
-            ..._buildLayerOverlays(),
-
-            // ── Free slot hints ──
-            ..._buildFreeHints(),
-
-            // ── Event cards ──
+            ..._buildLayers(),
+            ..._buildFree(),
             ...events.map((e) {
-              final startMin =
-                  (e.start.hour - _kStart) * 60.0 + e.start.minute.toDouble();
-              final top = startMin * (_kHourH / 60.0);
-              final height = (e.durationMinutes * (_kHourH / 60.0))
-                  .clamp(44.0, double.infinity)
+              final sm = (e.start.hour - _kStart) * 60.0 + e.start.minute;
+              final top = sm * (_kHourH / 60);
+              final hh = (e.durationMinutes * (_kHourH / 60))
+                  .clamp(38.0, double.infinity)
                   .toDouble();
               return Positioned(
                 top: top,
                 left: 54,
                 right: 0,
-                height: height,
+                height: hh,
                 child: _EventCard(
                   event: e,
                   smartLayer: smartLayer,
                   onTap: () => onEventTap(e),
-                  onLongPress: (details) =>
-                      onEventLongPress(e, details.globalPosition),
+                  onLongPress: (d) => onEventLongPress(e, d.globalPosition),
                 ),
               );
             }),
-
-            // ── Now line ──
             if (nowPx >= 0)
               Positioned(
-                top: nowPx - 1.0,
+                top: nowPx - 1,
                 left: 46,
                 right: 0,
                 child: AnimatedBuilder(
                   animation: nowPulseCtrl,
-                  builder: (_, __) => _NowLine(pulse: nowPulseCtrl.value),
+                  builder: (_, __) => _NowLine(
+                      pulse: nowPulseCtrl.value, pri: pri, priLight: priLight),
                 ),
               ),
           ],
@@ -995,32 +1388,32 @@ class _DayView extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildLayerOverlays() {
+  List<Widget> _buildLayers() {
     final layers = <({int sh, int eh, int? dur, Color c, String lbl})>[];
-
     if (smartLayer == _SmartLayer.energy || smartLayer == _SmartLayer.focus) {
-      layers.add((
-        sh: 8, eh: 11, dur: null, c: AppColors.electricBlue,
-        lbl: '⚡ Höchste Energie',
-      ));
+      layers.add((sh: 8, eh: 11, dur: null, c: pri, lbl: '⚡ Höchste Energie'));
     }
     if (smartLayer == _SmartLayer.energy ||
         smartLayer == _SmartLayer.recovery) {
       layers.add((
-        sh: 13, eh: 14, dur: null, c: AppColors.warning,
-        lbl: '😴 Mittagstief',
+        sh: 13,
+        eh: 14,
+        dur: null,
+        c: AppColors.warning,
+        lbl: '😴 Mittagstief'
       ));
     }
     if (smartLayer == _SmartLayer.focus) {
-      layers.add((
-        sh: 15, eh: 18, dur: null, c: AppColors.electricBlueLight,
-        lbl: '🎯 Fokus-Fenster',
-      ));
+      layers.add(
+          (sh: 15, eh: 18, dur: null, c: priLight, lbl: '🎯 Fokus-Fenster'));
     }
     if (smartLayer == _SmartLayer.recovery) {
       layers.add((
-        sh: 20, eh: 22, dur: null, c: AppColors.success,
-        lbl: '🌙 Recovery',
+        sh: 20,
+        eh: 22,
+        dur: null,
+        c: AppColors.success,
+        lbl: '🌙 Recovery'
       ));
     }
     if (smartLayer == _SmartLayer.buffer) {
@@ -1030,14 +1423,12 @@ class _DayView extends StatelessWidget {
         (sh: 16, eh: 16, dur: 15, c: AppColors.gold, lbl: '⏱ Puffer'),
       ]);
     }
-
     return layers.map((l) {
-      final startMin = (l.sh - _kStart) * 60;
-      final durMin = l.dur ?? ((l.eh - l.sh) * 60);
-      final top = (startMin * (_kHourH / 60.0));
+      final sm = (l.sh - _kStart) * 60;
+      final dm = l.dur ?? ((l.eh - l.sh) * 60);
+      final top = sm * (_kHourH / 60);
       final height =
-          (durMin * (_kHourH / 60.0)).clamp(20.0, double.infinity).toDouble();
-
+          (dm * (_kHourH / 60)).clamp(20.0, double.infinity).toDouble();
       return Positioned(
         top: top,
         left: 0,
@@ -1048,42 +1439,36 @@ class _DayView extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             color: l.c.withOpacity(0.04),
             border: Border(
-              left: BorderSide(color: l.c.withOpacity(0.22), width: 2.0),
-            ),
+                left: BorderSide(color: l.c.withOpacity(0.22), width: 2)),
           ),
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.only(left: 56, top: 4),
-          child: Text(
-            l.lbl,
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: l.c.withOpacity(0.48),
-            ),
-          ),
+          child: Text(l.lbl,
+              style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: l.c.withOpacity(0.48))),
         ),
       );
     }).toList();
   }
 
-  List<Widget> _buildFreeHints() {
+  List<Widget> _buildFree() {
     final hints = <Widget>[];
-    for (int h = _kStart; h < _kEnd - 1; h++) {
-      if (h < 8 || h > 19) continue;
-      if (events.any((e) => e.start.hour <= h && e.end.hour > h)) continue;
-      final top = ((h - _kStart) * _kHourH + 6.0);
+    for (int hr = _kStart; hr < _kEnd - 1; hr++) {
+      if (hr < 8 || hr > 19) continue;
+      if (events.any((e) => e.start.hour <= hr && e.end.hour > hr)) continue;
       hints.add(
         Positioned(
-          top: top,
+          top: (hr - _kStart) * _kHourH + 6,
           left: 54,
           right: 0,
           height: 24,
           child: GestureDetector(
-            onTap: () => onSlotTap(h),
+            onTap: () => onSlotTap(hr),
             child: _FreeHint(
-              label: '+ Termin · ${h.toString().padLeft(2, '0')}:00',
-            ),
+                label: '+ Termin · ${hr.toString().padLeft(2, '0')}:00'),
           ),
         ),
       );
@@ -1092,22 +1477,14 @@ class _DayView extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HOUR LINE — Tappable slot zones
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _HourLine extends StatelessWidget {
   final int hour;
   final bool isFree;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
-  const _HourLine({
-    required this.hour,
-    this.isFree = false,
-    this.onTap,
-    this.onLongPress,
-  });
+  const _HourLine(
+      {required this.hour, this.isFree = false, this.onTap, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
@@ -1129,44 +1506,39 @@ class _HourLine extends StatelessWidget {
                   '${hour.toString().padLeft(2, '0')}:00',
                   textAlign: TextAlign.right,
                   style: TextStyle(
-                    fontFamily: 'Satoshi',
-                    fontSize: 10,
-                    color: Colors.white.withOpacity(main ? 0.30 : 0.14),
-                    letterSpacing: 0.2,
-                  ),
+                      fontFamily: 'Satoshi',
+                      fontSize: 10,
+                      color: Colors.white.withOpacity(main ? 0.30 : 0.14),
+                      letterSpacing: 0.2),
                 ),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 0.5,
-                    margin: const EdgeInsets.only(top: 6),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
+              child: ClipRect(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 0.5,
+                      margin: const EdgeInsets.only(top: 6),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [
                           Colors.white.withOpacity(main ? 0.09 : 0.04),
                           Colors.white.withOpacity(main ? 0.04 : 0.015),
-                        ],
+                        ]),
                       ),
                     ),
-                  ),
-                  // Subtle tap hint on free slots
-                  if (isFree)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Center(
-                        child: Icon(
-                          Icons.add_rounded,
-                          size: 14,
-                          color: Colors.white.withOpacity(0.06),
-                        ),
+                    if (isFree)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 24),
+                        child: Center(
+                            child: Icon(Icons.add_rounded,
+                                size: 14,
+                                color: Colors.white.withOpacity(0.06))),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -1175,16 +1547,15 @@ class _HourLine extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EVENT CARD — Liquid Glass with press animation
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// EVENT CARD
+// ═══════════════════════════════════════════════════════════════════════════════
 
 class _EventCard extends StatefulWidget {
   final NexiiaEvent event;
   final _SmartLayer smartLayer;
   final VoidCallback onTap;
-  final void Function(LongPressStartDetails details) onLongPress;
+  final void Function(LongPressStartDetails) onLongPress;
 
   const _EventCard({
     required this.event,
@@ -1207,15 +1578,11 @@ class _EventCardState extends State<_EventCard>
   void initState() {
     super.initState();
     _press = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 140),
-    );
-    _scale = Tween<double>(begin: 1.0, end: 0.965).animate(
-      CurvedAnimation(parent: _press, curve: Curves.easeOut),
-    );
-    _glow = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _press, curve: Curves.easeOut),
-    );
+        vsync: this, duration: const Duration(milliseconds: 140));
+    _scale = Tween<double>(begin: 1.0, end: 0.965)
+        .animate(CurvedAnimation(parent: _press, curve: Curves.easeOut));
+    _glow = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _press, curve: Curves.easeOut));
   }
 
   @override
@@ -1227,6 +1594,8 @@ class _EventCardState extends State<_EventCard>
   @override
   Widget build(BuildContext context) {
     final c = widget.event.color;
+    final isShort = widget.event.durationMinutes <= 30;
+
     return GestureDetector(
       onTapDown: (_) => _press.forward(),
       onTapUp: (_) {
@@ -1234,21 +1603,19 @@ class _EventCardState extends State<_EventCard>
         widget.onTap();
       },
       onTapCancel: () => _press.reverse(),
-      onLongPressStart: (details) {
+      onLongPressStart: (d) {
         _press.reverse();
-        widget.onLongPress(details);
+        widget.onLongPress(d);
       },
       child: AnimatedBuilder(
         animation: _press,
-        builder: (_, child) => Transform.scale(
-          scale: _scale.value,
-          child: child,
-        ),
+        builder: (_, child) =>
+            Transform.scale(scale: _scale.value, child: child),
         child: Row(
           children: [
-            // ── Color accent bar ──
+            // Color bar
             Container(
-              width: 3.0,
+              width: 3,
               decoration: BoxDecoration(
                 color: c,
                 borderRadius: const BorderRadius.only(
@@ -1256,12 +1623,11 @@ class _EventCardState extends State<_EventCard>
                   bottomLeft: Radius.circular(14),
                 ),
                 boxShadow: [
-                  BoxShadow(color: c.withOpacity(0.55), blurRadius: 10),
+                  BoxShadow(color: c.withOpacity(0.55), blurRadius: 10)
                 ],
               ),
             ),
-
-            // ── Glass card body ──
+            // Glass body
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
@@ -1269,142 +1635,157 @@ class _EventCardState extends State<_EventCard>
                   bottomRight: Radius.circular(14),
                 ),
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 44, sigmaY: 44),
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                   child: AnimatedBuilder(
                     animation: _glow,
-                    builder: (_, __) => Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(14),
-                          bottomRight: Radius.circular(14),
-                        ),
-                        // Ultra-transparent glass with color tint
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            c.withOpacity(0.10 + _glow.value * 0.06),
-                            Colors.white.withOpacity(0.06),
-                            Colors.white.withOpacity(0.02),
+                    builder: (_, __) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(14),
+                            bottomRight: Radius.circular(14),
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              c.withOpacity(0.10 + _glow.value * 0.06),
+                              Colors.white.withOpacity(0.06),
+                              Colors.white.withOpacity(0.02),
+                            ],
+                            stops: const [0.0, 0.5, 1.0],
+                          ),
+                          border: Border.all(
+                            color: c.withOpacity(0.16 + _glow.value * 0.10),
+                            width: 0.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: c.withOpacity(0.10 + _glow.value * 0.08),
+                              blurRadius: 22,
+                              spreadRadius: -5,
+                              offset: const Offset(0, 5),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.10),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
+                              spreadRadius: -8,
+                            ),
                           ],
-                          stops: const [0.0, 0.5, 1.0],
                         ),
-                        border: Border.all(
-                          color: c.withOpacity(0.16 + _glow.value * 0.10),
-                          width: 0.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: c.withOpacity(0.10 + _glow.value * 0.08),
-                            blurRadius: 22,
-                            spreadRadius: -5,
-                            offset: const Offset(0, 5),
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.10),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                            spreadRadius: -8,
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          // Specular top highlight
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              height: 0.8,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    c.withOpacity(0.25),
-                                    Colors.white.withOpacity(0.30),
-                                    c.withOpacity(0.25),
-                                    Colors.transparent,
-                                  ],
-                                  stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
+                        child: Stack(
+                          children: [
+                            // Specular
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 0.8,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      c.withOpacity(0.25),
+                                      Colors.white.withOpacity(0.30),
+                                      c.withOpacity(0.25),
+                                      Colors.transparent,
+                                    ],
+                                    stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-
-                          // Content
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        widget.event.title,
-                                        style: const TextStyle(
-                                          fontFamily: 'Satoshi',
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                          height: 1.2,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                            // Content
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: isShort ? 3 : 8,
+                              ),
+                              child: LayoutBuilder(
+                                builder: (ctx, box) {
+                                  final ah = box.maxHeight;
+                                  final showTime = ah > 26;
+                                  final showSub =
+                                      widget.event.subtitle != null && ah > 52;
+                                  final showE =
+                                      widget.event.energyLevel != null &&
+                                          ah > 75;
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              widget.event.title,
+                                              style: TextStyle(
+                                                fontFamily: 'Satoshi',
+                                                fontSize: isShort ? 11 : 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white,
+                                                height: 1.2,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          if (widget.event.isAiSuggested) ...[
+                                            const SizedBox(width: 4),
+                                            _AiBadge(),
+                                          ],
+                                        ],
                                       ),
-                                    ),
-                                    if (widget.event.isAiSuggested) ...[
-                                      const SizedBox(width: 6),
-                                      _AiBadge(),
+                                      if (showTime) ...[
+                                        SizedBox(height: isShort ? 1 : 3),
+                                        Text(
+                                          '${_fmtTime(widget.event.start)} — ${_fmtTime(widget.event.end)}',
+                                          style: TextStyle(
+                                            fontFamily: 'Satoshi',
+                                            fontSize: isShort ? 9 : 10,
+                                            color:
+                                                Colors.white.withOpacity(0.40),
+                                            letterSpacing: 0.2,
+                                          ),
+                                        ),
+                                      ],
+                                      if (showSub) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          widget.event.subtitle!,
+                                          style: TextStyle(
+                                            fontFamily: 'Satoshi',
+                                            fontSize: 11,
+                                            color:
+                                                Colors.white.withOpacity(0.30),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                      if (showE) ...[
+                                        const SizedBox(height: 7),
+                                        _EnergyBar(
+                                          label: widget.smartLayer ==
+                                                  _SmartLayer.focus
+                                              ? 'Fokus'
+                                              : 'Energie',
+                                          value: widget.event.energyLevel!,
+                                          color: c,
+                                        ),
+                                      ],
                                     ],
-                                  ],
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  '${_fmtTime(widget.event.start)} – ${_fmtTime(widget.event.end)}',
-                                  style: TextStyle(
-                                    fontFamily: 'Satoshi',
-                                    fontSize: 10,
-                                    color: Colors.white.withOpacity(0.40),
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                                if (widget.event.subtitle != null &&
-                                    widget.event.durationMinutes >= 45) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    widget.event.subtitle!,
-                                    style: TextStyle(
-                                      fontFamily: 'Satoshi',
-                                      fontSize: 11,
-                                      color: Colors.white.withOpacity(0.30),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                                if (widget.event.energyLevel != null &&
-                                    widget.event.durationMinutes >= 55) ...[
-                                  const SizedBox(height: 7),
-                                  _EnergyBar(
-                                    label: widget.smartLayer == _SmartLayer.focus
-                                        ? 'Fokus'
-                                        : 'Energie',
-                                    value: widget.event.energyLevel!,
-                                    color: c,
-                                  ),
-                                ],
-                              ],
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -1419,30 +1800,22 @@ class _EventCardState extends State<_EventCard>
 class _AiBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            color: AppColors.electricBlue.withOpacity(0.15),
-            border: Border.all(
-              color: AppColors.electricBlue.withOpacity(0.30),
-              width: 0.5,
-            ),
-          ),
-          child: const Text(
-            'KI',
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.8,
-              color: AppColors.electricBlueLight,
-            ),
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        color: AppColors.electricBlue.withOpacity(0.15),
+        border: Border.all(
+            color: AppColors.electricBlue.withOpacity(0.30), width: 0.5),
+      ),
+      child: const Text(
+        'KI',
+        style: TextStyle(
+          fontFamily: 'Satoshi',
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+          color: AppColors.electricBlueLight,
         ),
       ),
     );
@@ -1453,26 +1826,19 @@ class _EnergyBar extends StatelessWidget {
   final String label;
   final double value;
   final Color color;
-
-  const _EnergyBar({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _EnergyBar(
+      {required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Satoshi',
-            fontSize: 9,
-            fontWeight: FontWeight.w500,
-            color: color.withOpacity(0.60),
-          ),
-        ),
+        Text(label,
+            style: TextStyle(
+                fontFamily: 'Satoshi',
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
+                color: color.withOpacity(0.60))),
         const SizedBox(width: 6),
         Expanded(
           child: ClipRRect(
@@ -1486,26 +1852,26 @@ class _EnergyBar extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 6),
-        Text(
-          '${(value * 100).round()}%',
-          style: TextStyle(
-            fontFamily: 'Satoshi',
-            fontSize: 9,
-            color: color.withOpacity(0.50),
-          ),
-        ),
+        Text('${(value * 100).round()}%',
+            style: TextStyle(
+                fontFamily: 'Satoshi',
+                fontSize: 9,
+                color: color.withOpacity(0.50))),
       ],
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NOW LINE
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOW LINE + FREE HINT
+// ═══════════════════════════════════════════════════════════════════════════════
 
 class _NowLine extends StatelessWidget {
   final double pulse;
-  const _NowLine({required this.pulse});
+  final Color pri;
+  final Color priLight;
+  const _NowLine(
+      {required this.pulse, required this.pri, required this.priLight});
 
   @override
   Widget build(BuildContext context) {
@@ -1516,12 +1882,11 @@ class _NowLine extends StatelessWidget {
           height: 9,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.electricBlueLight,
+            color: priLight,
             boxShadow: [
               BoxShadow(
-                color: AppColors.electricBlue.withOpacity(0.50 + pulse * 0.35),
-                blurRadius: 10 + pulse * 10,
-              ),
+                  color: pri.withOpacity(0.50 + pulse * 0.35),
+                  blurRadius: 10 + pulse * 10)
             ],
           ),
         ),
@@ -1529,19 +1894,16 @@ class _NowLine extends StatelessWidget {
           child: Container(
             height: 1.5,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.electricBlueLight.withOpacity(0.80),
-                  AppColors.electricBlue.withOpacity(0.30),
-                  Colors.transparent,
-                ],
-              ),
+              gradient: LinearGradient(colors: [
+                priLight.withOpacity(0.80),
+                pri.withOpacity(0.30),
+                Colors.transparent
+              ]),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.electricBlue.withOpacity(0.20 + pulse * 0.15),
-                  blurRadius: 6,
-                  offset: const Offset(0, 1),
-                ),
+                    color: pri.withOpacity(0.20 + pulse * 0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 1))
               ],
             ),
           ),
@@ -1551,59 +1913,41 @@ class _NowLine extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FREE HINT — Tappable glass pill
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _FreeHint extends StatelessWidget {
   final String label;
   const _FreeHint({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 24,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: AppColors.success.withOpacity(0.06),
-            border: Border.all(
-              color: AppColors.success.withOpacity(0.18),
-              width: 0.5,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.add_circle_outline_rounded,
-                size: 11,
-                color: AppColors.success.withOpacity(0.65),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                label,
-                style: TextStyle(
+    return Container(
+      height: 24,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: AppColors.success.withOpacity(0.08),
+        border:
+            Border.all(color: AppColors.success.withOpacity(0.18), width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.add_circle_outline_rounded,
+              size: 11, color: AppColors.success.withOpacity(0.65)),
+          const SizedBox(width: 5),
+          Text(label,
+              style: TextStyle(
                   fontFamily: 'Satoshi',
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.success.withOpacity(0.65),
-                ),
-              ),
-            ],
-          ),
-        ),
+                  color: AppColors.success.withOpacity(0.65))),
+        ],
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// WEEK VIEW — Liquid Glass panels
+// WEEK VIEW + STRIP + ROW
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _WeekView extends StatelessWidget {
@@ -1611,6 +1955,8 @@ class _WeekView extends StatelessWidget {
   final List<NexiiaEvent> weekEvents;
   final int selectedOffset;
   final double bottomPad;
+  final Color pri;
+  final Color priLight;
   final ValueChanged<int> onDayTap;
 
   const _WeekView({
@@ -1619,78 +1965,64 @@ class _WeekView extends StatelessWidget {
     required this.weekEvents,
     required this.selectedOffset,
     required this.bottomPad,
+    required this.pri,
+    required this.priLight,
     required this.onDayTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Week Strip ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _WeekStrip(
-                allEvents: allEvents,
-                selectedOffset: selectedOffset,
-                onDayTap: onDayTap,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: _WeekStrip(
+            allEvents: allEvents,
+            selectedOffset: selectedOffset,
+            onDayTap: onDayTap,
+            pri: pri,
+            priLight: priLight,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 20, bottomPad + 120),
+            child: _LiquidGlass(
+              borderRadius: 24,
+              blur: 50,
+              fillOpacity: 0.05,
+              borderOpacity: 0.10,
+              glowColor: pri,
+              glowOpacity: 0.05,
+              child: weekEvents.isEmpty ? _buildEmpty() : _buildList(),
             ),
-            const SizedBox(height: 14),
-
-            // ── Events panel ──
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, bottomPad + 120.0),
-                child: _LiquidGlass(
-                  borderRadius: 24,
-                  blur: 50,
-                  fillOpacity: 0.05,
-                  borderOpacity: 0.10,
-                  glowColor: AppColors.electricBlue,
-                  glowOpacity: 0.05,
-                  child: weekEvents.isEmpty ? _buildEmpty() : _buildList(),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildEmpty() {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.calendar_today_outlined,
-            size: 36,
-            color: Colors.white.withOpacity(0.14),
-          ),
+          Icon(Icons.calendar_today_outlined,
+              size: 36, color: Colors.white.withOpacity(0.14)),
           const SizedBox(height: 12),
-          Text(
-            'Keine Termine diese Woche',
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.white.withOpacity(0.30),
-            ),
-          ),
+          Text('Keine Termine diese Woche',
+              style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  fontSize: 14,
+                  color: Colors.white.withOpacity(0.30))),
           const SizedBox(height: 6),
-          Text(
-            'Tippe auf einen Tag für Details',
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              fontSize: 12,
-              color: Colors.white.withOpacity(0.18),
-            ),
-          ),
+          Text('Tippe auf einen Tag für Details',
+              style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.18))),
         ],
       ),
     );
@@ -1701,72 +2033,50 @@ class _WeekView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Header
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
           child: Row(
             children: [
-              Text(
-                'DIESE WOCHE',
-                style: TextStyle(
-                  fontFamily: 'Satoshi',
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.1,
-                  color: Colors.white.withOpacity(0.32),
-                ),
-              ),
+              Text('DIESE WOCHE',
+                  style: TextStyle(
+                      fontFamily: 'Satoshi',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.1,
+                      color: Colors.white.withOpacity(0.32))),
               const Spacer(),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(7),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7),
-                      color: AppColors.electricBlue.withOpacity(0.10),
-                      border: Border.all(
-                        color: AppColors.electricBlue.withOpacity(0.22),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: Text(
-                      '${weekEvents.length} Termine',
-                      style: const TextStyle(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: pri.withOpacity(0.10),
+                  border: Border.all(color: pri.withOpacity(0.22), width: 0.5),
+                ),
+                child: Text('${weekEvents.length} Termine',
+                    style: TextStyle(
                         fontFamily: 'Satoshi',
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.electricBlueLight,
-                      ),
-                    ),
-                  ),
-                ),
+                        color: priLight)),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
-
-        // Event list
         Flexible(
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
             physics: const BouncingScrollPhysics(),
             itemCount: weekEvents.length,
-            shrinkWrap: false,
             separatorBuilder: (_, __) => Container(
               height: 0.5,
               margin: const EdgeInsets.symmetric(vertical: 7),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.0),
-                    Colors.white.withOpacity(0.06),
-                    Colors.white.withOpacity(0.0),
-                  ],
-                ),
+                gradient: LinearGradient(colors: [
+                  Colors.white.withOpacity(0.0),
+                  Colors.white.withOpacity(0.06),
+                  Colors.white.withOpacity(0.0),
+                ]),
               ),
             ),
             itemBuilder: (_, i) => _WeekRow(event: weekEvents[i]),
@@ -1777,25 +2087,25 @@ class _WeekView extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// WEEK STRIP — Liquid Glass day pills
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _WeekStrip extends StatelessWidget {
   final List<NexiiaEvent> allEvents;
   final int selectedOffset;
   final ValueChanged<int> onDayTap;
+  final Color pri;
+  final Color priLight;
 
   const _WeekStrip({
     required this.allEvents,
     required this.selectedOffset,
     required this.onDayTap,
+    required this.pri,
+    required this.priLight,
   });
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final monday = now.subtract(Duration(days: now.weekday - 1));
+    final mon = now.subtract(Duration(days: now.weekday - 1));
     const labels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
     return _LiquidGlass(
@@ -1806,7 +2116,7 @@ class _WeekStrip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       child: Row(
         children: List.generate(7, (i) {
-          final day = monday.add(Duration(days: i));
+          final day = mon.add(Duration(days: i));
           final isToday = day.year == now.year &&
               day.month == now.month &&
               day.day == now.day;
@@ -1827,61 +2137,50 @@ class _WeekStrip extends StatelessWidget {
                 duration: const Duration(milliseconds: 260),
                 curve: Curves.easeOutCubic,
                 margin: const EdgeInsets.symmetric(horizontal: 2),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(13),
                   color: isSel
-                      ? AppColors.electricBlue.withOpacity(0.14)
+                      ? pri.withOpacity(0.14)
                       : isToday
                           ? Colors.white.withOpacity(0.04)
                           : Colors.transparent,
                   border: isSel
-                      ? Border.all(
-                          color: AppColors.electricBlue.withOpacity(0.32),
-                          width: 0.5,
-                        )
+                      ? Border.all(color: pri.withOpacity(0.32), width: 0.5)
                       : null,
                   boxShadow: isSel
                       ? [
                           BoxShadow(
-                            color: AppColors.electricBlue.withOpacity(0.12),
-                            blurRadius: 14,
-                            spreadRadius: -3,
-                          ),
+                              color: pri.withOpacity(0.12),
+                              blurRadius: 14,
+                              spreadRadius: -3)
                         ]
                       : [],
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      labels[i],
-                      style: TextStyle(
-                        fontFamily: 'Satoshi',
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.3,
-                        color: isSel
-                            ? AppColors.electricBlueLight
-                            : Colors.white.withOpacity(0.34),
-                      ),
-                    ),
+                    Text(labels[i],
+                        style: TextStyle(
+                            fontFamily: 'Satoshi',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.3,
+                            color: isSel
+                                ? priLight
+                                : Colors.white.withOpacity(0.34))),
                     const SizedBox(height: 5),
-                    Text(
-                      '${day.day}',
-                      style: TextStyle(
-                        fontFamily: 'Satoshi',
-                        fontSize: 15,
-                        fontWeight:
-                            isToday ? FontWeight.w700 : FontWeight.w400,
-                        color: isSel
-                            ? AppColors.electricBlueLight
-                            : isToday
-                                ? Colors.white.withOpacity(0.90)
-                                : Colors.white.withOpacity(0.50),
-                      ),
-                    ),
+                    Text('${day.day}',
+                        style: TextStyle(
+                            fontFamily: 'Satoshi',
+                            fontSize: 15,
+                            fontWeight:
+                                isToday ? FontWeight.w700 : FontWeight.w400,
+                            color: isSel
+                                ? priLight
+                                : isToday
+                                    ? Colors.white.withOpacity(0.90)
+                                    : Colors.white.withOpacity(0.50))),
                     const SizedBox(height: 6),
                     Wrap(
                       alignment: WrapAlignment.center,
@@ -1897,9 +2196,8 @@ class _WeekStrip extends StatelessWidget {
                                   color: e.color.withOpacity(0.80),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: e.color.withOpacity(0.40),
-                                      blurRadius: 4,
-                                    ),
+                                        color: e.color.withOpacity(0.40),
+                                        blurRadius: 4)
                                   ],
                                 ),
                               ))
@@ -1915,10 +2213,6 @@ class _WeekStrip extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// WEEK ROW
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _WeekRow extends StatelessWidget {
   final NexiiaEvent event;
@@ -1938,10 +2232,7 @@ class _WeekRow extends StatelessWidget {
               color: event.color,
               borderRadius: BorderRadius.circular(2),
               boxShadow: [
-                BoxShadow(
-                  color: event.color.withOpacity(0.35),
-                  blurRadius: 6,
-                ),
+                BoxShadow(color: event.color.withOpacity(0.35), blurRadius: 6)
               ],
             ),
           ),
@@ -1951,71 +2242,60 @@ class _WeekRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  event.title,
-                  style: const TextStyle(
-                    fontFamily: 'Satoshi',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Text(event.title,
+                    style: const TextStyle(
+                        fontFamily: 'Satoshi',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
                 Text(
-                  '${wd[(event.start.weekday - 1).clamp(0, 6)]} · ${_fmtTime(event.start)} Uhr',
-                  style: TextStyle(
-                    fontFamily: 'Satoshi',
-                    fontSize: 11,
-                    color: Colors.white.withOpacity(0.35),
-                  ),
-                ),
+                    '${wd[(event.start.weekday - 1).clamp(0, 6)]} · ${_fmtTime(event.start)} Uhr',
+                    style: TextStyle(
+                        fontFamily: 'Satoshi',
+                        fontSize: 11,
+                        color: Colors.white.withOpacity(0.35))),
               ],
             ),
           ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(7),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                  color: event.color.withOpacity(0.08),
-                  border: Border.all(
-                    color: event.color.withOpacity(0.20),
-                    width: 0.5,
-                  ),
-                ),
-                child: Text(
-                  '${event.durationMinutes} min',
-                  style: TextStyle(
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(7),
+              color: event.color.withOpacity(0.08),
+              border:
+                  Border.all(color: event.color.withOpacity(0.20), width: 0.5),
+            ),
+            child: Text('${event.durationMinutes} min',
+                style: TextStyle(
                     fontFamily: 'Satoshi',
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: event.color.withOpacity(0.75),
-                  ),
-                ),
-              ),
-            ),
+                    color: event.color.withOpacity(0.75))),
           ),
         ],
       ),
     );
   }
-}// ═══════════════════════════════════════════════════════════════════════════════
-// FLOATING ADD BUTTON — Liquid Glass Pill
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FLOATING ADD BUTTON
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _FloatingAddButton extends StatelessWidget {
   final VoidCallback onTap;
   final AnimationController breathCtrl;
+  final Color pri;
+  final Color priLight;
 
   const _FloatingAddButton({
     required this.onTap,
     required this.breathCtrl,
+    required this.pri,
+    required this.priLight,
   });
 
   @override
@@ -2025,13 +2305,15 @@ class _FloatingAddButton extends StatelessWidget {
       child: AnimatedBuilder(
         animation: breathCtrl,
         builder: (_, child) {
-          final b = 0.97 + breathCtrl.value * 0.03;
-          return Transform.scale(scale: b, child: child);
+          return Transform.scale(
+            scale: 0.97 + breathCtrl.value * 0.03,
+            child: child,
+          );
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
               height: 52,
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -2041,83 +2323,42 @@ class _FloatingAddButton extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.electricBlue.withOpacity(0.22),
-                    AppColors.electricBlue.withOpacity(0.10),
-                    Colors.white.withOpacity(0.04),
+                    pri.withOpacity(0.22),
+                    pri.withOpacity(0.10),
+                    Colors.white.withOpacity(0.04)
                   ],
                   stops: const [0.0, 0.4, 1.0],
                 ),
-                border: Border.all(
-                  color: AppColors.electricBlue.withOpacity(0.30),
-                  width: 0.5,
-                ),
+                border: Border.all(color: pri.withOpacity(0.30), width: 0.5),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.electricBlue.withOpacity(0.20),
-                    blurRadius: 28,
-                    spreadRadius: -4,
-                    offset: const Offset(0, 6),
-                  ),
+                      color: pri.withOpacity(0.20),
+                      blurRadius: 28,
+                      spreadRadius: -4,
+                      offset: const Offset(0, 6)),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.16),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                    spreadRadius: -8,
-                  ),
+                      color: Colors.black.withOpacity(0.16),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -8),
                 ],
               ),
-              child: Stack(
-                children: [
-                  // Specular highlight
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 0.8,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(28),
-                          topRight: Radius.circular(28),
-                        ),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            Colors.white.withOpacity(0.35),
-                            AppColors.electricBlueLight.withOpacity(0.40),
-                            Colors.white.withOpacity(0.35),
-                            Colors.transparent,
-                          ],
-                          stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Content
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.add_rounded,
-                          size: 20,
-                          color: AppColors.electricBlueLight.withOpacity(0.90),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Termin',
-                          style: TextStyle(
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded,
+                        size: 20, color: priLight.withOpacity(0.90)),
+                    const SizedBox(width: 8),
+                    Text('Termin',
+                        style: TextStyle(
                             fontFamily: 'Satoshi',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.electricBlueLight.withOpacity(0.90),
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                            color: priLight.withOpacity(0.90),
+                            letterSpacing: 0.2)),
+                  ],
+                ),
               ),
             ),
           ),
@@ -2128,7 +2369,7 @@ class _FloatingAddButton extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// VOICE ORB — Liquid Glass
+// VOICE ORB + WAVEFORM
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _VoiceOrb extends StatelessWidget {
@@ -2137,6 +2378,8 @@ class _VoiceOrb extends StatelessWidget {
   final AnimationController breathCtrl;
   final AnimationController waveCtrl;
   final VoidCallback onTap;
+  final Color pri;
+  final Color priLight;
 
   const _VoiceOrb({
     required this.isActive,
@@ -2144,6 +2387,8 @@ class _VoiceOrb extends StatelessWidget {
     required this.breathCtrl,
     required this.waveCtrl,
     required this.onTap,
+    required this.pri,
+    required this.priLight,
   });
 
   @override
@@ -2162,27 +2407,20 @@ class _VoiceOrb extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Pulse rings
                 if (isListening)
                   ...List.generate(3, (i) {
-                    final delay = i * 0.33;
                     final p =
-                        ((wave - delay) % 1.0).clamp(0.0, 1.0).toDouble();
+                        ((wave - i * 0.33) % 1.0).clamp(0.0, 1.0).toDouble();
                     return Container(
                       width: 64 + p * 44,
                       height: 64 + p * 44,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.electricBlue
-                              .withOpacity((1 - p) * 0.30),
-                          width: 1.0,
-                        ),
+                            color: pri.withOpacity((1 - p) * 0.30), width: 1.0),
                       ),
                     );
                   }),
-
-                // Glow
                 if (isActive)
                   Container(
                     width: 62,
@@ -2191,21 +2429,18 @@ class _VoiceOrb extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.electricBlue
-                              .withOpacity(0.25 + breathCtrl.value * 0.18),
-                          blurRadius: 30 + breathCtrl.value * 18,
-                          spreadRadius: 2,
-                        ),
+                            color:
+                                pri.withOpacity(0.25 + breathCtrl.value * 0.18),
+                            blurRadius: 30 + breathCtrl.value * 18,
+                            spreadRadius: 2)
                       ],
                     ),
                   ),
-
-                // Orb body
                 Transform.scale(
                   scale: breathe,
                   child: ClipOval(
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 44, sigmaY: 44),
+                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                       child: Container(
                         width: 56,
                         height: 56,
@@ -2214,30 +2449,29 @@ class _VoiceOrb extends StatelessWidget {
                           gradient: RadialGradient(
                             colors: isActive
                                 ? [
-                                    AppColors.electricBlue.withOpacity(0.40),
-                                    AppColors.electricBlue.withOpacity(0.14),
-                                    Colors.white.withOpacity(0.04),
+                                    pri.withOpacity(0.40),
+                                    pri.withOpacity(0.14),
+                                    Colors.white.withOpacity(0.04)
                                   ]
                                 : [
                                     Colors.white.withOpacity(0.10),
                                     Colors.white.withOpacity(0.05),
-                                    Colors.white.withOpacity(0.02),
+                                    Colors.white.withOpacity(0.02)
                                   ],
                             stops: const [0.0, 0.5, 1.0],
                           ),
                           border: Border.all(
                             color: isActive
-                                ? AppColors.electricBlue.withOpacity(0.50)
+                                ? pri.withOpacity(0.50)
                                 : Colors.white.withOpacity(0.16),
                             width: 0.8,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.12),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                              spreadRadius: -4,
-                            ),
+                                color: Colors.black.withOpacity(0.12),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                                spreadRadius: -4)
                           ],
                         ),
                         child: Icon(
@@ -2255,10 +2489,11 @@ class _VoiceOrb extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Waveform
                 if (isListening)
-                  Positioned(bottom: 0, child: _WaveformBar(wave: wave)),
+                  Positioned(
+                      bottom: 0,
+                      child: _WaveformBar(
+                          wave: wave, pri: pri, priLight: priLight)),
               ],
             ),
           );
@@ -2270,18 +2505,20 @@ class _VoiceOrb extends StatelessWidget {
 
 class _WaveformBar extends StatelessWidget {
   final double wave;
-  const _WaveformBar({required this.wave});
+  final Color pri;
+  final Color priLight;
+  const _WaveformBar(
+      {required this.wave, required this.pri, required this.priLight});
 
   @override
   Widget build(BuildContext context) {
     final rng = math.Random(12);
-    const bars = 5;
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
-      children: List.generate(bars, (i) {
+      children: List.generate(5, (i) {
         final h = (4.0 +
-                math.sin((wave * math.pi * 2) + (i * math.pi / bars)) *
+                math.sin((wave * math.pi * 2) + (i * math.pi / 5)) *
                     6.0 *
                     (0.5 + rng.nextDouble() * 0.5))
             .abs()
@@ -2293,13 +2530,8 @@ class _WaveformBar extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 1),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
-            color: AppColors.electricBlueLight.withOpacity(0.75),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.electricBlue.withOpacity(0.20),
-                blurRadius: 4,
-              ),
-            ],
+            color: priLight.withOpacity(0.75),
+            boxShadow: [BoxShadow(color: pri.withOpacity(0.20), blurRadius: 4)],
           ),
         );
       }),
@@ -2308,16 +2540,20 @@ class _WaveformBar extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// AI CARD — Liquid Glass
+// AI CARD
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _AiCard extends StatefulWidget {
   final String text;
+  final Color pri;
+  final Color priLight;
   final VoidCallback onAccept;
   final VoidCallback onDismiss;
 
   const _AiCard({
     required this.text,
+    required this.pri,
+    required this.priLight,
     required this.onAccept,
     required this.onDismiss,
   });
@@ -2335,14 +2571,10 @@ class _AiCardState extends State<_AiCard> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
+        vsync: this, duration: const Duration(milliseconds: 500));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.20),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _slide = Tween<Offset>(begin: const Offset(0, 0.20), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
     _ctrl.forward();
   }
 
@@ -2361,7 +2593,7 @@ class _AiCardState extends State<_AiCard> with SingleTickerProviderStateMixin {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(22),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -2370,131 +2602,86 @@ class _AiCardState extends State<_AiCard> with SingleTickerProviderStateMixin {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.electricBlue.withOpacity(0.12),
+                    widget.pri.withOpacity(0.12),
                     Colors.white.withOpacity(0.06),
-                    Colors.white.withOpacity(0.02),
+                    Colors.white.withOpacity(0.02)
                   ],
                   stops: const [0.0, 0.5, 1.0],
                 ),
-                border: Border.all(
-                  color: AppColors.electricBlue.withOpacity(0.25),
-                  width: 0.5,
-                ),
+                border:
+                    Border.all(color: widget.pri.withOpacity(0.25), width: 0.5),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.electricBlue.withOpacity(0.14),
-                    blurRadius: 36,
-                    offset: const Offset(0, 8),
-                    spreadRadius: -6,
-                  ),
+                      color: widget.pri.withOpacity(0.14),
+                      blurRadius: 36,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -6),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.14),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                    spreadRadius: -8,
-                  ),
+                      color: Colors.black.withOpacity(0.14),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -8),
                 ],
               ),
-              child: Stack(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Specular highlight
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 0.8,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            AppColors.electricBlueLight.withOpacity(0.30),
-                            Colors.white.withOpacity(0.35),
-                            AppColors.electricBlueLight.withOpacity(0.30),
-                            Colors.transparent,
+                  Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: widget.priLight,
+                          boxShadow: [
+                            BoxShadow(
+                                color: widget.pri.withOpacity(0.40),
+                                blurRadius: 6)
                           ],
-                          stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
                         ),
                       ),
-                    ),
-                  ),
-                  // Content
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.electricBlueLight,
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      AppColors.electricBlue.withOpacity(0.40),
-                                  blurRadius: 6,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 7),
-                          const Text(
-                            'Nexiia AI',
-                            style: TextStyle(
+                      const SizedBox(width: 7),
+                      Text('Nexiia AI',
+                          style: TextStyle(
                               fontFamily: 'Satoshi',
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.9,
-                              color: AppColors.electricBlueLight,
-                            ),
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: widget.onDismiss,
-                            child: Icon(
-                              Icons.close_rounded,
-                              size: 15,
-                              color: Colors.white.withOpacity(0.35),
-                            ),
-                          ),
-                        ],
+                              color: widget.priLight)),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: widget.onDismiss,
+                        child: Icon(Icons.close_rounded,
+                            size: 15, color: Colors.white.withOpacity(0.35)),
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        widget.text,
-                        style: TextStyle(
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(widget.text,
+                      style: TextStyle(
                           fontFamily: 'Satoshi',
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                           height: 1.55,
-                          color: Colors.white.withOpacity(0.80),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _GlassButton(
+                          color: Colors.white.withOpacity(0.80))),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _GlassButton(
                               label: 'Ablehnen',
                               color: Colors.white,
                               filled: false,
-                              onTap: widget.onDismiss,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _GlassButton(
+                              onTap: widget.onDismiss)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          child: _GlassButton(
                               label: 'Einplanen',
-                              color: AppColors.electricBlue,
+                              color: widget.pri,
                               filled: true,
-                              onTap: widget.onAccept,
-                            ),
-                          ),
-                        ],
-                      ),
+                              onTap: widget.onAccept)),
                     ],
                   ),
                 ],
@@ -2508,20 +2695,24 @@ class _AiCardState extends State<_AiCard> with SingleTickerProviderStateMixin {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// EVENT SHEET — Liquid Glass (transparent, floating, editable)
+// EVENT SHEET
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _EventSheet extends StatefulWidget {
   final NexiiaEvent event;
   final double botPad;
+  final Color pri;
+  final Color priLight;
   final VoidCallback onClose;
   final VoidCallback onDelete;
   final VoidCallback onDuplicate;
-  final void Function(String title, String subtitle, String location) onSave;
+  final void Function(String, String, String) onSave;
 
   const _EventSheet({
     required this.event,
     required this.botPad,
+    required this.pri,
+    required this.priLight,
     required this.onClose,
     required this.onDelete,
     required this.onDuplicate,
@@ -2545,9 +2736,7 @@ class _EventSheetState extends State<_EventSheet>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 380),
-    );
+        vsync: this, duration: const Duration(milliseconds: 380));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
     _titleCtrl = TextEditingController(text: widget.event.title);
@@ -2564,11 +2753,7 @@ class _EventSheetState extends State<_EventSheet>
 
   void _save() {
     HapticFeedback.mediumImpact();
-    widget.onSave(
-      _titleCtrl.text,
-      _subtitleCtrl.text,
-      _locationCtrl.text,
-    );
+    widget.onSave(_titleCtrl.text, _subtitleCtrl.text, _locationCtrl.text);
   }
 
   @override
@@ -2583,11 +2768,10 @@ class _EventSheetState extends State<_EventSheet>
   @override
   Widget build(BuildContext context) {
     final c = widget.event.color;
-    final screenH = MediaQuery.of(context).size.height;
-    final maxSize = (_editing ? 520.0 : 420.0) / screenH;
-    final clampedMax = maxSize.clamp(0.35, 0.78).toDouble();
-    final initSize = (_editing ? 480.0 : 340.0) / screenH;
-    final clampedInit = initSize.clamp(0.30, 0.68).toDouble();
+    final sH = MediaQuery.of(context).size.height;
+    final cMax = ((_editing ? 520.0 : 420.0) / sH).clamp(0.35, 0.78).toDouble();
+    final cInit =
+        ((_editing ? 480.0 : 340.0) / sH).clamp(0.30, 0.68).toDouble();
 
     return FadeTransition(
       opacity: _fade,
@@ -2596,25 +2780,23 @@ class _EventSheetState extends State<_EventSheet>
         child: Container(
           color: Colors.black.withOpacity(0.35),
           child: DraggableScrollableSheet(
-            initialChildSize: clampedInit,
+            initialChildSize: cInit,
             minChildSize: 0.20,
-            maxChildSize: clampedMax,
+            maxChildSize: cMax,
             snap: true,
-            snapSizes: [clampedInit, clampedMax],
-            builder: (context, scrollCtrl) {
+            snapSizes: [cInit, cMax],
+            builder: (ctx, sc) {
               return GestureDetector(
                 onTap: () {},
                 child: ClipRRect(
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(28)),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 55, sigmaY: 55),
+                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(28),
-                        ),
-                        // LIQUID GLASS — not opaque!
+                            top: Radius.circular(28)),
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -2628,36 +2810,31 @@ class _EventSheetState extends State<_EventSheet>
                         ),
                         border: Border(
                           top: BorderSide(
-                            color: Colors.white.withOpacity(0.18),
-                            width: 0.5,
-                          ),
+                              color: Colors.white.withOpacity(0.18),
+                              width: 0.5),
                           left: BorderSide(
-                            color: Colors.white.withOpacity(0.08),
-                            width: 0.5,
-                          ),
+                              color: Colors.white.withOpacity(0.08),
+                              width: 0.5),
                           right: BorderSide(
-                            color: Colors.white.withOpacity(0.08),
-                            width: 0.5,
-                          ),
+                              color: Colors.white.withOpacity(0.08),
+                              width: 0.5),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.20),
-                            blurRadius: 50,
-                            offset: const Offset(0, -10),
-                            spreadRadius: -10,
-                          ),
+                              color: Colors.black.withOpacity(0.20),
+                              blurRadius: 50,
+                              offset: const Offset(0, -10),
+                              spreadRadius: -10),
                           BoxShadow(
-                            color: c.withOpacity(0.08),
-                            blurRadius: 40,
-                            offset: const Offset(0, -6),
-                            spreadRadius: -8,
-                          ),
+                              color: c.withOpacity(0.08),
+                              blurRadius: 40,
+                              offset: const Offset(0, -6),
+                              spreadRadius: -8),
                         ],
                       ),
                       child: Stack(
                         children: [
-                          // Top specular highlight
+                          // Specular
                           Positioned(
                             top: 0,
                             left: 0,
@@ -2680,7 +2857,7 @@ class _EventSheetState extends State<_EventSheet>
                           ),
                           // Content
                           CustomScrollView(
-                            controller: scrollCtrl,
+                            controller: sc,
                             physics: const BouncingScrollPhysics(),
                             slivers: [
                               SliverToBoxAdapter(
@@ -2699,12 +2876,10 @@ class _EventSheetState extends State<_EventSheet>
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(2),
-                                          color:
-                                              Colors.white.withOpacity(0.16),
+                                          color: Colors.white.withOpacity(0.16),
                                         ),
                                       ),
                                     ),
-                                    // Content area
                                     Padding(
                                       padding: const EdgeInsets.fromLTRB(
                                           24, 0, 24, 0),
@@ -2727,10 +2902,9 @@ class _EventSheetState extends State<_EventSheet>
                                                       BorderRadius.circular(2),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color:
-                                                          c.withOpacity(0.50),
-                                                      blurRadius: 10,
-                                                    ),
+                                                        color:
+                                                            c.withOpacity(0.50),
+                                                        blurRadius: 10)
                                                   ],
                                                 ),
                                               ),
@@ -2742,8 +2916,7 @@ class _EventSheetState extends State<_EventSheet>
                                                         hint: 'Titel',
                                                         fontSize: 19,
                                                         fontWeight:
-                                                            FontWeight.w600,
-                                                      )
+                                                            FontWeight.w600)
                                                     : Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -2752,173 +2925,142 @@ class _EventSheetState extends State<_EventSheet>
                                                             MainAxisSize.min,
                                                         children: [
                                                           Text(
-                                                            widget.event.title,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontFamily:
-                                                                  'Satoshi',
-                                                              fontSize: 19,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color:
-                                                                  Colors.white,
-                                                              height: 1.15,
-                                                            ),
-                                                          ),
+                                                              widget
+                                                                  .event.title,
+                                                              style: const TextStyle(
+                                                                  fontFamily:
+                                                                      'Satoshi',
+                                                                  fontSize: 19,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  height:
+                                                                      1.15)),
                                                           if (widget.event
                                                                   .subtitle !=
                                                               null) ...[
                                                             const SizedBox(
                                                                 height: 3),
                                                             Text(
-                                                              widget.event
-                                                                  .subtitle!,
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Satoshi',
-                                                                fontSize: 13,
-                                                                color: Colors
-                                                                    .white
-                                                                    .withOpacity(
-                                                                        0.40),
-                                                              ),
-                                                            ),
+                                                                widget.event
+                                                                    .subtitle!,
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Satoshi',
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: Colors
+                                                                        .white
+                                                                        .withOpacity(
+                                                                            0.40))),
                                                           ],
                                                         ],
                                                       ),
                                               ),
                                               if (widget.event.isAiSuggested)
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8),
-                                                  child: _AiBadge(),
-                                                ),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 8),
+                                                    child: _AiBadge()),
                                             ],
                                           ),
-
                                           // Edit fields
                                           if (_editing) ...[
                                             const SizedBox(height: 12),
                                             _GlassTextField(
-                                              controller: _subtitleCtrl,
-                                              hint: 'Beschreibung',
-                                              fontSize: 14,
-                                            ),
+                                                controller: _subtitleCtrl,
+                                                hint: 'Beschreibung',
+                                                fontSize: 14),
                                             const SizedBox(height: 10),
                                             _GlassTextField(
-                                              controller: _locationCtrl,
-                                              hint: 'Ort',
-                                              fontSize: 14,
-                                              prefixIcon:
-                                                  Icons.location_on_outlined,
-                                            ),
+                                                controller: _locationCtrl,
+                                                hint: 'Ort',
+                                                fontSize: 14,
+                                                prefixIcon:
+                                                    Icons.location_on_outlined),
                                           ],
-
                                           const SizedBox(height: 20),
-
-                                          // Time
+                                          // Info
                                           _SheetInfoRow(
                                             icon: Icons.schedule_rounded,
                                             text:
-                                                '${_fmtTime(widget.event.start)} – '
-                                                '${_fmtTime(widget.event.end)} · '
-                                                '${widget.event.durationMinutes} Min.',
+                                                '${_fmtTime(widget.event.start)} – ${_fmtTime(widget.event.end)} · ${widget.event.durationMinutes} Min.',
                                             color: c,
                                           ),
-
                                           if (widget.event.location != null &&
                                               !_editing) ...[
                                             const SizedBox(height: 10),
                                             _SheetInfoRow(
-                                              icon:
-                                                  Icons.location_on_outlined,
-                                              text: widget.event.location!,
-                                              color: c,
-                                            ),
+                                                icon:
+                                                    Icons.location_on_outlined,
+                                                text: widget.event.location!,
+                                                color: c),
                                           ],
-
-                                          // Energy bar
                                           if (widget.event.energyLevel !=
                                               null) ...[
                                             const SizedBox(height: 18),
-                                            Text(
-                                              'FOKUS-INTENSITÄT',
-                                              style: TextStyle(
-                                                fontFamily: 'Satoshi',
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: 1.1,
-                                                color: Colors.white
-                                                    .withOpacity(0.32),
-                                              ),
-                                            ),
+                                            Text('FOKUS-INTENSITÄT',
+                                                style: TextStyle(
+                                                    fontFamily: 'Satoshi',
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w600,
+                                                    letterSpacing: 1.1,
+                                                    color: Colors.white
+                                                        .withOpacity(0.32))),
                                             const SizedBox(height: 8),
                                             _EnergyBar(
-                                              label: 'Fokus',
-                                              value:
-                                                  widget.event.energyLevel!,
-                                              color: c,
-                                            ),
+                                                label: 'Fokus',
+                                                value:
+                                                    widget.event.energyLevel!,
+                                                color: c),
                                           ],
-
                                           const SizedBox(height: 22),
-
                                           // Actions
                                           if (_editing)
                                             Row(
                                               children: [
                                                 Expanded(
-                                                  child: _GlassButton(
-                                                    label: 'Abbrechen',
-                                                    color: Colors.white,
-                                                    filled: false,
-                                                    onTap: _toggleEdit,
-                                                  ),
-                                                ),
+                                                    child: _GlassButton(
+                                                        label: 'Abbrechen',
+                                                        color: Colors.white,
+                                                        filled: false,
+                                                        onTap: _toggleEdit)),
                                                 const SizedBox(width: 10),
                                                 Expanded(
-                                                  child: _GlassButton(
-                                                    label: 'Speichern',
-                                                    color:
-                                                        AppColors.electricBlue,
-                                                    filled: true,
-                                                    onTap: _save,
-                                                  ),
-                                                ),
+                                                    child: _GlassButton(
+                                                        label: 'Speichern',
+                                                        color: widget.pri,
+                                                        filled: true,
+                                                        onTap: _save)),
                                               ],
                                             )
                                           else
                                             Row(
                                               children: [
                                                 _SheetAction(
-                                                  icon: Icons.edit_outlined,
-                                                  label: 'Bearbeiten',
-                                                  color: c,
-                                                  onTap: _toggleEdit,
-                                                ),
+                                                    icon: Icons.edit_outlined,
+                                                    label: 'Bearbeiten',
+                                                    color: c,
+                                                    onTap: _toggleEdit),
                                                 const SizedBox(width: 8),
                                                 _SheetAction(
-                                                  icon: Icons.copy_rounded,
-                                                  label: 'Duplizieren',
-                                                  color: AppColors
-                                                      .electricBlueLight,
-                                                  onTap: widget.onDuplicate,
-                                                ),
+                                                    icon: Icons.copy_rounded,
+                                                    label: 'Duplizieren',
+                                                    color: widget.priLight,
+                                                    onTap: widget.onDuplicate),
                                                 const SizedBox(width: 8),
                                                 _SheetAction(
-                                                  icon: Icons
-                                                      .delete_outline_rounded,
-                                                  label: 'Löschen',
-                                                  color: AppColors.error,
-                                                  onTap: widget.onDelete,
-                                                ),
+                                                    icon: Icons
+                                                        .delete_outline_rounded,
+                                                    label: 'Löschen',
+                                                    color: AppColors.error,
+                                                    onTap: widget.onDelete),
                                               ],
                                             ),
-
-                                          SizedBox(
-                                              height: widget.botPad + 16),
+                                          SizedBox(height: widget.botPad + 16),
                                         ],
                                       ),
                                     ),
@@ -2941,9 +3083,9 @@ class _EventSheetState extends State<_EventSheet>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GLASS TEXT FIELD — Transparent editable input
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// HELPER WIDGETS
+// ═══════════════════════════════════════════════════════════════════════════════
 
 class _GlassTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -2962,55 +3104,38 @@ class _GlassTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white.withOpacity(0.05),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.10),
-              width: 0.5,
-            ),
-          ),
-          child: TextField(
-            controller: controller,
-            style: TextStyle(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withOpacity(0.05),
+        border: Border.all(color: Colors.white.withOpacity(0.10), width: 0.5),
+      ),
+      child: TextField(
+        controller: controller,
+        style: TextStyle(
+            fontFamily: 'Satoshi',
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            color: Colors.white),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
               fontFamily: 'Satoshi',
               fontSize: fontSize,
               fontWeight: fontWeight,
-              color: Colors.white,
-            ),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(
-                fontFamily: 'Satoshi',
-                fontSize: fontSize,
-                fontWeight: fontWeight,
-                color: Colors.white.withOpacity(0.22),
-              ),
-              prefixIcon: prefixIcon != null
-                  ? Icon(prefixIcon, size: 18,
-                      color: Colors.white.withOpacity(0.30))
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
-              ),
-            ),
-          ),
+              color: Colors.white.withOpacity(0.22)),
+          prefixIcon: prefixIcon != null
+              ? Icon(prefixIcon,
+                  size: 18, color: Colors.white.withOpacity(0.30))
+              : null,
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GLASS BUTTON — Reusable action button
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _GlassButton extends StatelessWidget {
   final String label;
@@ -3029,52 +3154,42 @@ class _GlassButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(13),
-              gradient: filled
-                  ? LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        color.withOpacity(0.70),
-                        color.withOpacity(0.50),
-                      ],
-                    )
-                  : null,
-              color: filled ? null : Colors.white.withOpacity(0.06),
-              border: Border.all(
-                color: filled
-                    ? color.withOpacity(0.50)
-                    : Colors.white.withOpacity(0.12),
-                width: 0.5,
-              ),
-              boxShadow: filled
-                  ? [
-                      BoxShadow(
-                        color: color.withOpacity(0.25),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                        spreadRadius: -4,
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Satoshi',
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: filled ? Colors.white : Colors.white.withOpacity(0.45),
-              ),
-            ),
+      child: Container(
+        height: 42,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(13),
+          gradient: filled
+              ? LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [color.withOpacity(0.70), color.withOpacity(0.50)],
+                )
+              : null,
+          color: filled ? null : Colors.white.withOpacity(0.06),
+          border: Border.all(
+            color: filled
+                ? color.withOpacity(0.50)
+                : Colors.white.withOpacity(0.12),
+            width: 0.5,
+          ),
+          boxShadow: filled
+              ? [
+                  BoxShadow(
+                      color: color.withOpacity(0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                      spreadRadius: -4)
+                ]
+              : [],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Satoshi',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: filled ? Colors.white : Colors.white.withOpacity(0.45),
           ),
         ),
       ),
@@ -3082,20 +3197,12 @@ class _GlassButton extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHEET INFO ROW
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _SheetInfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
   final Color color;
-
-  const _SheetInfoRow({
-    required this.icon,
-    required this.text,
-    required this.color,
-  });
+  const _SheetInfoRow(
+      {required this.icon, required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -3104,75 +3211,57 @@ class _SheetInfoRow extends StatelessWidget {
         Icon(icon, size: 15, color: color.withOpacity(0.60)),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              fontSize: 13,
-              color: Colors.white.withOpacity(0.60),
-            ),
-          ),
+          child: Text(text,
+              style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  fontSize: 13,
+                  color: Colors.white.withOpacity(0.60))),
         ),
       ],
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHEET ACTION — Glass pill button
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _SheetAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
-
-  const _SheetAction({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+  const _SheetAction(
+      {required this.icon,
+      required this.label,
+      required this.color,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(13),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: Container(
-              height: 46,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(13),
-                color: color.withOpacity(0.07),
-                border: Border.all(
-                  color: color.withOpacity(0.18),
-                  width: 0.5,
+        child: Container(
+          height: 46,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(13),
+            color: color.withOpacity(0.07),
+            border: Border.all(color: color.withOpacity(0.18), width: 0.5),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: color.withOpacity(0.85)),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                  color: color.withOpacity(0.85),
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 16, color: color.withOpacity(0.85)),
-                  const SizedBox(height: 3),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontFamily: 'Satoshi',
-                      fontSize: 9,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.2,
-                      color: color.withOpacity(0.85),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
         ),
       ),
@@ -3181,5 +3270,5 @@ class _SheetAction extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// END OF FILE — Liquid Glass Edition v5
+// END — Liquid Glass v7 (Full Atmosphere + Performance + All Fixes)
 // ═══════════════════════════════════════════════════════════════════════════════
