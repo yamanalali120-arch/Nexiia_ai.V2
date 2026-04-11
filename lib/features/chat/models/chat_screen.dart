@@ -416,7 +416,7 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
                         ? _buildChat()
                         : (_threads.isEmpty ? _buildWelcome() : _buildList()),
                   ),
-                  _buildInput(bottomPad),
+                  _buildInput(bottomPad + 96),
                 ],
               ),
             ),
@@ -640,7 +640,7 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
         const SizedBox(height: 12),
         for (int i = 0; i < _threads.length; i++)
           _buildThreadTile(_threads[i]),
-        const SizedBox(height: 100),
+        const SizedBox(height: 110),
       ],
     );
   }
@@ -835,7 +835,7 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
     return ListView.builder(
       controller: _scrollController,
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
       itemCount: msgs.length + (_isAiTyping ? 1 : 0),
       itemBuilder: (BuildContext context, int i) {
         if (i == msgs.length && _isAiTyping) {

@@ -1558,8 +1558,7 @@ class _SolveScreenState extends State<SolveScreen>
     );
   }
 
-// HIER ENDET TEIL 1 — TEIL 2 DIREKT DARUNTER EINFÜGEN (KEIN ENTER DAZWISCHEN)// ═══════════════════════════════════════════════════════════════════════════
-// TEIL 2 — ALLES AB HIER BIS DATEIENDE
+
 // ═══════════════════════════════════════════════════════════════════════════
 
   @override
@@ -1682,7 +1681,7 @@ class _SolveScreenState extends State<SolveScreen>
                 ),
                 Positioned(
                   right: 16,
-                  bottom: pad.bottom + 120,
+                  bottom: pad.bottom + 206,
                   child: Column(
                     children: [
                       _iconBtn(
@@ -1727,7 +1726,7 @@ class _SolveScreenState extends State<SolveScreen>
                 ),
                 if (_selId != null) _buildDetail(),
                 Positioned(
-                  bottom: pad.bottom + 24,
+                  bottom: pad.bottom + 110,
                   left: 0,
                   right: 0,
                   child: Center(
@@ -1778,7 +1777,7 @@ class _SolveScreenState extends State<SolveScreen>
                   ),
                 ),
                 Positioned(
-                  bottom: pad.bottom + 68,
+                  bottom: pad.bottom + 154,
                   left: 20,
                   right: 20,
                   child: Row(
@@ -1824,7 +1823,7 @@ class _SolveScreenState extends State<SolveScreen>
         _conns.where((c) => c.from == node.id || c.to == node.id).length;
 
     return Positioned(
-      bottom: MediaQuery.of(context).padding.bottom + 110,
+      bottom: MediaQuery.of(context).padding.bottom + 196,
       left: 20,
       right: 75,
       child: TweenAnimationBuilder<double>(
