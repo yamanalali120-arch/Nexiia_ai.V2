@@ -2,12 +2,12 @@
 // NEXIIA — Login Screen
 // ════════════════════════════════════════════════════════════════
 
-import 'package:flutter/material.dart';
 // ════════════════════════════════════════════════════════════════
 // NEXIIA — Login Screen
 // ════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';  // ← NEU!
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../core/theme/app_typography.dart';
@@ -103,8 +103,18 @@ class _LoginScreenState extends State<LoginScreen>
     } catch (e) {
       if (!mounted) return;
       Haptics.error();
+      
+      // ⬇️ DEBUG: Zeige echten Fehler in Console
+      print('🔴🔴🔴 LOGIN ERROR: $e');
+      print('🔴🔴🔴 ERROR TYPE: ${e.runtimeType}');
+      if (e is AuthException) {
+        print('🔴🔴🔴 MESSAGE: ${e.message}');
+        print('🔴🔴🔴 STATUS CODE: ${e.statusCode}');
+      }
+      
       setState(() {
-        _errorMessage = AuthErrorMapper.mapAny(e);
+        // Temporär: echten Fehler anzeigen
+        _errorMessage = 'DEBUG: $e';
         _isLoading = false;
       });
     }
@@ -306,3 +316,10 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 }
+
+
+
+
+
+
+

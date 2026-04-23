@@ -76,3 +76,4 @@ class PasswordStrengthBar extends StatelessWidget {
     );
   }
 }
+

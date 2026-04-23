@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // NEXIIA — Greeting Screen (Onboarding Step 1)
+// Schnellere Animationen + Farbiger Weiter-Button
 // ═══════════════════════════════════════════════════════════════════
 
 import 'dart:ui';
@@ -13,7 +14,6 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/haptic_utils.dart';
 import '../../shared/widgets/animated_gradient_bg.dart';
-import '../../shared/widgets/premium_button.dart';
 import '../../navigation/app_router.dart';
 
 class GreetingScreen extends StatefulWidget {
@@ -41,13 +41,16 @@ class _GreetingScreenState extends State<GreetingScreen>
   late final Animation<Alignment> _orbAlignmentAnimation;
   late final Animation<double> _orbOpacityAnimation;
 
-  // ─── Timing-Konstanten ──────────────────────────────────────
+  // Button Glow
+  late final AnimationController _buttonGlowController;
 
-  static const _animDuration = Duration(milliseconds: 600);
-  static const _line1Delay = Duration(milliseconds: 600);
-  static const _line2Delay = Duration(milliseconds: 1800);
-  static const _line3Delay = Duration(milliseconds: 3000);
-  static const _buttonDelay = Duration(milliseconds: 4200);
+  // ─── Timing — Schneller & gleichmäßiger ─────────────────────
+
+  static const _animDuration = Duration(milliseconds: 400);
+  static const _line1Delay = Duration(milliseconds: 400);
+  static const _line2Delay = Duration(milliseconds: 1000);
+  static const _line3Delay = Duration(milliseconds: 1600);
+  static const _buttonDelay = Duration(milliseconds: 2200);
   static const _curve = Curves.easeOutCubic;
   static const _springCurve = Curves.easeOutBack;
 
@@ -69,7 +72,7 @@ class _GreetingScreenState extends State<GreetingScreen>
     );
     _buttonController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 500),
     );
 
     // Ambient Glow – sanftes Atmen
@@ -123,6 +126,12 @@ class _GreetingScreenState extends State<GreetingScreen>
     ));
     _orbController.repeat();
 
+    // Button Glow
+    _buttonGlowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
     _startSequence();
   }
 
@@ -152,6 +161,7 @@ class _GreetingScreenState extends State<GreetingScreen>
     _buttonController.dispose();
     _ambientGlowController.dispose();
     _orbController.dispose();
+    _buttonGlowController.dispose();
     super.dispose();
   }
 
@@ -285,15 +295,11 @@ class _GreetingScreenState extends State<GreetingScreen>
 
                     const Spacer(flex: 4),
 
-                    // ── Button mit Spring-Animation ──
+                    // ── Farbiger Weiter-Button ──
                     _buildAnimatedLine(
                       controller: _buttonController,
                       useSpring: true,
-                      child: PremiumButton(
-                        label: AppStrings.greetingContinue,
-                        onPressed: _onContinue,
-                        isExpanded: true,
-                      ),
+                      child: _buildWeiterButton(),
                     ),
 
                     SizedBox(height: AppSpacing.xxl + 8),
@@ -304,6 +310,95 @@ class _GreetingScreenState extends State<GreetingScreen>
           ),
         ),
       ),
+    );
+  }
+
+  // ───────────────────────────────────────────────
+  // FARBIGER WEITER-BUTTON
+  // ───────────────────────────────────────────────
+
+  Widget _buildWeiterButton() {
+    return AnimatedBuilder(
+      animation: _buttonGlowController,
+      builder: (context, _) {
+        final glowVal = _buttonGlowController.value;
+
+        return GestureDetector(
+          onTap: _onContinue,
+          child: Container(
+            width: double.infinity,
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.electricBlue.withValues(alpha: 0.85),
+                  AppColors.electricBlue.withValues(alpha: 0.65),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.electricBlue
+                      .withValues(alpha: 0.25 + glowVal * 0.15),
+                  blurRadius: 20,
+                  spreadRadius: -2,
+                  offset: const Offset(0, 6),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.15),
+                width: 0.5,
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Top highlight
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 24,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.12),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const Center(
+                  child: Text(
+                    'Weiter',
+                    style: TextStyle(
+                      fontFamily: 'Satoshi',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

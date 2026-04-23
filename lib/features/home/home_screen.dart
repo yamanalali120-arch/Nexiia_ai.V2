@@ -24,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // ── State ──
   int _currentTabIndex = 0;
+  bool _isChatThreadOpen = false;
   String _userName = '';
   bool _voiceActive = false;
   bool _sheetOpen = false;
@@ -71,17 +72,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
       }
     });
-    
 
-    _bgCtrl = AnimationController(
-        vsync: this, duration: const Duration(seconds: 18))
-      ..repeat();
+    _bgCtrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 18))
+          ..repeat();
     _breathCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2800))
       ..repeat(reverse: true);
-    _nebulaCtrl = AnimationController(
-        vsync: this, duration: const Duration(seconds: 10))
-      ..repeat();
+    _nebulaCtrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 10))
+          ..repeat();
     _floatCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 3600))
       ..repeat();
@@ -109,12 +109,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _pulseCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2200))
       ..repeat();
-    _refractionCtrl = AnimationController(
-        vsync: this, duration: const Duration(seconds: 6))
-      ..repeat();
-    _prismaCtrl = AnimationController(
-        vsync: this, duration: const Duration(seconds: 4))
-      ..repeat();
+    _refractionCtrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 6))
+          ..repeat();
+    _prismaCtrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 4))
+          ..repeat();
 
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
@@ -128,10 +128,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     for (final c in [
-      _bgCtrl, _breathCtrl, _nebulaCtrl, _heartbeatCtrl, _floatCtrl,
-      _sonarCtrl, _waveCtrl, _glowCtrl, _tabCtrl, _greetCtrl,
-      _staggerCtrl, _shimmerCtrl, _logoBreathCtrl, _pulseCtrl,
-      _refractionCtrl, _prismaCtrl,
+      _bgCtrl,
+      _breathCtrl,
+      _nebulaCtrl,
+      _heartbeatCtrl,
+      _floatCtrl,
+      _sonarCtrl,
+      _waveCtrl,
+      _glowCtrl,
+      _tabCtrl,
+      _greetCtrl,
+      _staggerCtrl,
+      _shimmerCtrl,
+      _logoBreathCtrl,
+      _pulseCtrl,
+      _refractionCtrl,
+      _prismaCtrl,
     ]) {
       c.dispose();
     }
@@ -194,7 +206,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String _dateString() {
     final n = DateTime.now();
     const d = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-    const m = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+    const m = [
+      'Jan',
+      'Feb',
+      'Mär',
+      'Apr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Dez'
+    ];
     return '${d[n.weekday - 1]}, ${n.day}. ${m[n.month - 1]}';
   }
 
@@ -257,9 +282,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           sigmaX: _isCrystal ? 18 : 30,
           sigmaY: _isCrystal ? 18 : 30,
         ),
-        child: onTap != null
-            ? _GlassTap(onTap: onTap, child: card)
-            : card,
+        child: onTap != null ? _GlassTap(onTap: onTap, child: card) : card,
       ),
     );
   }
@@ -348,8 +371,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: const Color(0x10FFFFFF),
                       borderRadius: BorderRadius.circular(8),
@@ -424,14 +447,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   begin: const Offset(0, 0.03),
                                   end: Offset.zero,
                                 ).animate(CurvedAnimation(
-                                    parent: a,
-                                    curve: Curves.easeOutCubic)),
+                                    parent: a, curve: Curves.easeOutCubic)),
                                 child: child,
                               ),
                             );
                           },
-                          transitionDuration:
-                              const Duration(milliseconds: 400),
+                          transitionDuration: const Duration(milliseconds: 400),
                         ),
                       );
                     },
@@ -459,9 +480,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ? SweepGradient(
                     startAngle: _prismaCtrl.value * math.pi * 2,
                     colors: const [
-                      Color(0xFFFF6B6B), Color(0xFFFFE66D),
-                      Color(0xFF4ECDC4), Color(0xFF45B7D1),
-                      Color(0xFFA78BFA), Color(0xFFF472B6),
+                      Color(0xFFFF6B6B),
+                      Color(0xFFFFE66D),
+                      Color(0xFF4ECDC4),
+                      Color(0xFF45B7D1),
+                      Color(0xFFA78BFA),
+                      Color(0xFFF472B6),
                       Color(0xFFFF6B6B),
                     ],
                   )
@@ -474,8 +498,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               BoxShadow(
                 color: _isCrystal
                     ? const Color(0x25FFFFFF)
-                    : Color.fromRGBO(
-                        _pri.red, _pri.green, _pri.blue, 0.45),
+                    : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.45),
                 blurRadius: 28,
                 spreadRadius: 2,
               ),
@@ -483,9 +506,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           child: Center(
             child: Text(
-              _userName.isNotEmpty
-                  ? _userName[0].toUpperCase()
-                  : '?',
+              _userName.isNotEmpty ? _userName[0].toUpperCase() : '?',
               style: const TextStyle(
                 fontFamily: 'Satoshi',
                 color: Colors.white,
@@ -515,9 +536,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: danger
-                    ? const Color(0x1AFF453A)
-                    : const Color(0x0AFFFFFF),
+                color:
+                    danger ? const Color(0x1AFF453A) : const Color(0x0AFFFFFF),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: danger
@@ -529,9 +549,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Icon(
                 icon,
                 size: 18,
-                color: danger
-                    ? const Color(0xFFFF453A)
-                    : AppColors.white50,
+                color: danger ? const Color(0xFFFF453A) : AppColors.white50,
               ),
             ),
             const SizedBox(width: 14),
@@ -540,9 +558,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 label,
                 style: TextStyle(
                   fontFamily: 'Satoshi',
-                  color: danger
-                      ? const Color(0xFFFF453A)
-                      : AppColors.white80,
+                  color: danger ? const Color(0xFFFF453A) : AppColors.white80,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -551,15 +567,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Icon(
               Icons.chevron_right_rounded,
               size: 18,
-              color: danger
-                  ? const Color(0x55FF453A)
-                  : const Color(0x22FFFFFF),
+              color: danger ? const Color(0x55FF453A) : const Color(0x22FFFFFF),
             ),
           ],
         ),
       ),
     );
   }
+
+  // ════════════════════════════════════════════════════
+  //  BUILD
+  // ════════════════════════════════════════════════════
 
   // ════════════════════════════════════════════════════
   //  BUILD
@@ -573,6 +591,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             // Background
@@ -581,7 +600,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 animation: _bgCtrl,
                 builder: (BuildContext c, Widget? ch) => CustomPaint(
                   size: Size.infinite,
-                   painter: _AuroraBgPainter(
+                  painter: _AuroraBgPainter(
                     t: _bgCtrl.value,
                     pri: _pri,
                     sec: _sec,
@@ -597,8 +616,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Positioned.fill(
                 child: AnimatedBuilder(
                   animation: Listenable.merge([_prismaCtrl, _breathCtrl]),
-                  builder: (BuildContext context, Widget? _) =>
-                      CustomPaint(
+                  builder: (BuildContext context, Widget? _) => CustomPaint(
                     painter: _CrystalRefractionOverlay(
                       t: _prismaCtrl.value,
                       breath: _breathCtrl.value,
@@ -625,27 +643,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               },
               children: [
                 _buildHomeTab(),
-                const NexiiaChatScreen(),
+                // ── HIER WIRD DER CALLBACK EMPFANGEN ──
+                NexiiaChatScreen(
+                  onThreadToggled: (isOpen) {
+                    if (mounted) {
+                      setState(() => _isChatThreadOpen = isOpen);
+                    }
+                  },
+                ),
                 const SolveScreen(),
                 const NexiiaHorizonCalendar(),
                 _buildFokusTab(),
               ],
             ),
 
-            // Entity
-            if (_showVoice)
-              Positioned(
-                left: 18,
-                bottom: bp + 92,
-                child: _buildEntity(),
+            // Entity — cinematic hide/show
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 650),
+              curve: Curves.easeOutExpo,
+              left: 18,
+              bottom: (_showVoice && !_isChatThreadOpen) ? bp + 92 : -120,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 350),
+                opacity: (_showVoice && !_isChatThreadOpen) ? 1.0 : 0.0,
+                child: IgnorePointer(
+                  ignoring: !(_showVoice && !_isChatThreadOpen),
+                  child: _buildEntity(),
+                ),
               ),
+            ),
 
-            // Nav
-            Positioned(
+            // Nav — cinematic hide/show (REAGIERT AUF CHAT THREAD)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 650),
+              curve: Curves.easeOutExpo,
               left: 14,
               right: 14,
-              bottom: bp + 8,
-              child: _buildNavBar(),
+              bottom: _isChatThreadOpen ? -(78 + bp + 20) : bp + 8,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOut,
+                opacity: _isChatThreadOpen ? 0.0 : 1.0,
+                child: IgnorePointer(
+                  ignoring: _isChatThreadOpen,
+                  child: _buildNavBar(),
+                ),
+              ),
             ),
           ],
         ),
@@ -657,16 +700,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //  HOME TAB
   // ════════════════════════════════════════════════════
 
+  String _getDynamicSubtitle() {
+    final h = DateTime.now().hour;
+    final subs = <String>[
+      'Was steht heute an?',
+      'Bereit für den Tag?',
+      'Was beschäftigt dich?',
+      'Wie kann ich helfen?',
+      'Worauf liegt dein Fokus?',
+      'Lass uns loslegen',
+      'Was brauchst du gerade?',
+      'Neuer Tag, neue Energie',
+      'Was möchtest du erreichen?',
+    ];
+    final seed = h * 7 + _userName.hashCode;
+    return subs[seed.abs() % subs.length];
+  }
+
   Widget _buildHomeTab() {
     final double tp = MediaQuery.of(context).padding.top;
 
     return AnimatedBuilder(
       animation: Listenable.merge([
-        _greetCtrl, _staggerCtrl, _shimmerCtrl, _logoBreathCtrl,
+        _greetCtrl,
+        _staggerCtrl,
+        _shimmerCtrl,
+        _logoBreathCtrl,
       ]),
       builder: (BuildContext context, Widget? _) {
-        final double greet =
-            Curves.easeOutCubic.transform(_greetCtrl.value);
+        final double greet = Curves.easeOutCubic.transform(_greetCtrl.value);
         final double stagger = _staggerCtrl.value;
 
         return SingleChildScrollView(
@@ -693,7 +755,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 6),
 
-              // Greeting
+              // Greeting — ohne Emoji, mit Dynamic Subtitle
               Opacity(
                 opacity: greet,
                 child: Transform.translate(
@@ -712,23 +774,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            '$_userName ',
-                            style: const TextStyle(
-                              fontFamily: 'Satoshi',
-                              color: AppColors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.8,
-                            ),
-                          ),
-                          Text(
-                            _greetEmoji(),
-                            style: const TextStyle(fontSize: 26),
-                          ),
-                        ],
+                      Text(
+                        _userName,
+                        style: const TextStyle(
+                          fontFamily: 'Satoshi',
+                          color: AppColors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.8,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _getDynamicSubtitle(),
+                        style: TextStyle(
+                          fontFamily: 'Satoshi',
+                          color: _isCrystal
+                              ? AppColors.white30
+                              : Color.fromRGBO(
+                                  _pri.red, _pri.green, _pri.blue, 0.5),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ],
                   ),
@@ -756,8 +823,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       animation: Listenable.merge([_shimmerCtrl, _logoBreathCtrl]),
       builder: (BuildContext context, Widget? child) {
         final double shimmerPos = _shimmerCtrl.value * 3.0 - 1.0;
-        final double breathScale =
-            0.98 + _logoBreathCtrl.value * 0.02;
+        final double breathScale = 0.98 + _logoBreathCtrl.value * 0.02;
 
         return Transform.scale(
           scale: breathScale,
@@ -769,9 +835,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   begin: Alignment(-1.0 + shimmerPos, -0.3),
                   end: Alignment(1.0 + shimmerPos, 0.3),
                   colors: const [
-                    Color(0xFFFF6B6B), Color(0xFFFFE66D),
-                    Color(0xFF4ECDC4), Color(0xFF45B7D1),
-                    Color(0xFFA78BFA), Color(0xFFF472B6),
+                    Color(0xFFFF6B6B),
+                    Color(0xFFFFE66D),
+                    Color(0xFF4ECDC4),
+                    Color(0xFF45B7D1),
+                    Color(0xFFA78BFA),
+                    Color(0xFFF472B6),
                     Color(0xFFFF6B6B),
                   ],
                 ).createShader(bounds);
@@ -780,7 +849,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 begin: Alignment(-1.0 + shimmerPos, -0.3),
                 end: Alignment(1.0 + shimmerPos, 0.3),
                 colors: [
-                  _pri, _sec, const Color(0xFF06B6D4), _pri, _sec,
+                  _pri,
+                  _sec,
+                  const Color(0xFF06B6D4),
+                  _pri,
+                  _sec,
                 ],
                 stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
               ).createShader(bounds);
@@ -826,8 +899,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: _isCrystal
-                            ? Color.fromRGBO(
-                                255, 255, 255, 0.3 * (1 - pulse))
+                            ? Color.fromRGBO(255, 255, 255, 0.3 * (1 - pulse))
                             : Color.fromRGBO(
                                 _pri.red, _pri.green, _pri.blue, 0.4),
                         width: 1.0 * (1.0 - pulse),
@@ -842,12 +914,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     shape: BoxShape.circle,
                     gradient: _isCrystal
                         ? SweepGradient(
-                            startAngle:
-                                _prismaCtrl.value * math.pi * 2,
+                            startAngle: _prismaCtrl.value * math.pi * 2,
                             colors: const [
-                              Color(0xFFFF6B6B), Color(0xFFFFE66D),
-                              Color(0xFF4ECDC4), Color(0xFF45B7D1),
-                              Color(0xFFA78BFA), Color(0xFFF472B6),
+                              Color(0xFFFF6B6B),
+                              Color(0xFFFFE66D),
+                              Color(0xFF4ECDC4),
+                              Color(0xFF45B7D1),
+                              Color(0xFFA78BFA),
+                              Color(0xFFF472B6),
                               Color(0xFFFF6B6B),
                             ],
                           )
@@ -855,7 +929,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              _pri, _sec, const Color(0xFF06B6D4),
+                              _pri,
+                              _sec,
+                              const Color(0xFF06B6D4),
                             ],
                           ),
                     boxShadow: [
@@ -863,8 +939,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         color: _isCrystal
                             ? const Color(0x20FFFFFF)
                             : Color.fromRGBO(
-                                _pri.red, _pri.green, _pri.blue,
-                                0.35),
+                                _pri.red, _pri.green, _pri.blue, 0.35),
                         blurRadius: 20,
                         spreadRadius: 1,
                       ),
@@ -872,9 +947,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   child: Center(
                     child: Text(
-                      _userName.isNotEmpty
-                          ? _userName[0].toUpperCase()
-                          : '?',
+                      _userName.isNotEmpty ? _userName[0].toUpperCase() : '?',
                       style: const TextStyle(
                         fontFamily: 'Satoshi',
                         color: Colors.white,
@@ -893,11 +966,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: const Color(0xFF30D158),
-                      border: Border.all(
-                          color: AppColors.background, width: 2),
+                      border: Border.all(color: AppColors.background, width: 2),
                       boxShadow: const [
-                        BoxShadow(
-                            color: Color(0x6030D158), blurRadius: 6),
+                        BoxShadow(color: Color(0x6030D158), blurRadius: 6),
                       ],
                     ),
                   ),
@@ -911,98 +982,100 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   // ── Quick Actions — Größer ──
- Widget _buildQuickActions() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(left: 2, bottom: 14),
-        child: Row(
-          children: [
-            AnimatedBuilder(
-              animation: _breathCtrl,
-              builder: (BuildContext context, Widget? _) {
-                return Container(
-                  width: 4,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    gradient: _isCrystal
-                        ? LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color.fromRGBO(255, 255, 255,
-                                  0.6 + _breathCtrl.value * 0.2),
-                              Color.fromRGBO(255, 255, 255,
-                                  0.2 + _breathCtrl.value * 0.1),
-                            ],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [_pri, _sec],
-                          ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'SCHNELLZUGRIFF',
-              style: TextStyle(
-                fontFamily: 'Satoshi',
-                color: AppColors.white30,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
+  Widget _buildQuickActions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 2, bottom: 14),
+          child: Row(
+            children: [
+              AnimatedBuilder(
+                animation: _breathCtrl,
+                builder: (BuildContext context, Widget? _) {
+                  return Container(
+                    width: 4,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      gradient: _isCrystal
+                          ? LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color.fromRGBO(255, 255, 255,
+                                    0.6 + _breathCtrl.value * 0.2),
+                                Color.fromRGBO(255, 255, 255,
+                                    0.2 + _breathCtrl.value * 0.1),
+                              ],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [_pri, _sec],
+                            ),
+                    ),
+                  );
+                },
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              const Text(
+                'SCHNELLZUGRIFF',
+                style: TextStyle(
+                  fontFamily: 'Satoshi',
+                  color: AppColors.white30,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      SizedBox(
-        height: 136,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          clipBehavior: Clip.none,
-          children: [
-            // ✅ Chat = primary Farbe
-            _quickAction(Icons.bolt_rounded, 'Chat',
-                _isCrystal ? const Color(0xFFE8ECF4) : _pri,
-                () => _onTabTap(1)),
-            const SizedBox(width: 10),
-            // ✅ Lösen = andere Farbe (cyan/teal statt secondary)
-            _quickAction(Icons.auto_awesome_rounded, 'Lösen',
-                _isCrystal
-                    ? const Color(0xFFC4D0E0)
-                    : const Color(0xFF06B6D4),
-                () => _onTabTap(2)),
-            const SizedBox(width: 10),
-            // Kalender = secondary
-            _quickAction(
-                Icons.event_note_rounded,
-                'Kalender',
-                _isCrystal
-                    ? const Color(0xFFB0C4DE)
-                    : _sec,
-                () => _onTabTap(3)),
-            const SizedBox(width: 10),
-            // Fokus = pink
-            _quickAction(
-                Icons.hexagon_rounded,
-                'Fokus',
-                _isCrystal
-                    ? const Color(0xFFD4BEE0)
-                    : const Color(0xFFF472B6),
-                () => _onTabTap(4)),
-          ],
+        SizedBox(
+          height: 136,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            clipBehavior: Clip.none,
+            children: [
+              // ✅ Chat = primary Farbe
+              _quickAction(
+                  Icons.bolt_rounded,
+                  'Chat',
+                  _isCrystal ? const Color(0xFFE8ECF4) : _pri,
+                  () => _onTabTap(1)),
+              const SizedBox(width: 10),
+              // ✅ Lösen = andere Farbe (cyan/teal statt secondary)
+              _quickAction(
+                  Icons.auto_awesome_rounded,
+                  'Lösen',
+                  _isCrystal
+                      ? const Color(0xFFC4D0E0)
+                      : const Color(0xFF06B6D4),
+                  () => _onTabTap(2)),
+              const SizedBox(width: 10),
+              // Kalender = secondary
+              _quickAction(
+                  Icons.event_note_rounded,
+                  'Kalender',
+                  _isCrystal ? const Color(0xFFB0C4DE) : _sec,
+                  () => _onTabTap(3)),
+              const SizedBox(width: 10),
+              // Fokus = pink
+              _quickAction(
+                  Icons.hexagon_rounded,
+                  'Fokus',
+                  _isCrystal
+                      ? const Color(0xFFD4BEE0)
+                      : const Color(0xFFF472B6),
+                  () => _onTabTap(4)),
+            ],
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
   Widget _quickAction(
       IconData icon, String label, Color color, VoidCallback onTap) {
@@ -1048,20 +1121,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Color.fromRGBO(
-                                  color.red, color.green, color.blue,
+                              Color.fromRGBO(color.red, color.green, color.blue,
                                   _isCrystal ? 0.1 : 0.2),
-                              Color.fromRGBO(
-                                  color.red, color.green, color.blue,
+                              Color.fromRGBO(color.red, color.green, color.blue,
                                   _isCrystal ? 0.04 : 0.08),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Color.fromRGBO(
-                                  color.red, color.green, color.blue,
-                                  _isCrystal ? 0.1 : 0.25),
+                              color: Color.fromRGBO(color.red, color.green,
+                                  color.blue, _isCrystal ? 0.1 : 0.25),
                               blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
@@ -1141,8 +1211,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           const SizedBox(height: 18),
           Row(
             children: [
-              _miniStat('Aufgaben', '0',
-                  _isCrystal ? const Color(0xFFE8ECF4) : _pri),
+              _miniStat(
+                  'Aufgaben', '0', _isCrystal ? const Color(0xFFE8ECF4) : _pri),
               const SizedBox(width: 12),
               _miniStat('Erledigt', '0', const Color(0xFF30D158)),
               const SizedBox(width: 12),
@@ -1186,20 +1256,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               colors: [
                 Color.fromRGBO(color.red, color.green, color.blue,
                     0.15 + _breathCtrl.value * 0.05),
-                Color.fromRGBO(
-                    color.red, color.green, color.blue, 0.06),
+                Color.fromRGBO(color.red, color.green, color.blue, 0.06),
               ],
             ),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: Color.fromRGBO(
-                  color.red, color.green, color.blue, 0.08),
+              color: Color.fromRGBO(color.red, color.green, color.blue, 0.08),
               width: 0.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color.fromRGBO(
-                    color.red, color.green, color.blue, 0.12),
+                color: Color.fromRGBO(color.red, color.green, color.blue, 0.12),
                 blurRadius: 12,
               ),
             ],
@@ -1217,8 +1284,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         gradient: const LinearGradient(
             colors: [Color(0x2030D158), Color(0x1030D158)]),
         borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: const Color(0x3030D158), width: 0.5),
+        border: Border.all(color: const Color(0x3030D158), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1254,12 +1320,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          color: Color.fromRGBO(color.red, color.green, color.blue,
-              _isCrystal ? 0.05 : 0.06),
+          color: Color.fromRGBO(
+              color.red, color.green, color.blue, _isCrystal ? 0.05 : 0.06),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: Color.fromRGBO(color.red, color.green, color.blue,
-                _isCrystal ? 0.08 : 0.1),
+            color: Color.fromRGBO(
+                color.red, color.green, color.blue, _isCrystal ? 0.08 : 0.1),
             width: 0.5,
           ),
         ),
@@ -1297,18 +1363,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         animation: _prismaCtrl,
         builder: (BuildContext context, Widget? _) {
           return Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 22, vertical: 13),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
             decoration: BoxDecoration(
               gradient: _isCrystal
                   ? SweepGradient(
                       center: Alignment.center,
-                      startAngle:
-                          _prismaCtrl.value * math.pi * 2,
+                      startAngle: _prismaCtrl.value * math.pi * 2,
                       colors: const [
-                        Color(0xCCFF6B6B), Color(0xCCFFE66D),
-                        Color(0xCC4ECDC4), Color(0xCC45B7D1),
-                        Color(0xCCA78BFA), Color(0xCCF472B6),
+                        Color(0xCCFF6B6B),
+                        Color(0xCCFFE66D),
+                        Color(0xCC4ECDC4),
+                        Color(0xCC45B7D1),
+                        Color(0xCCA78BFA),
+                        Color(0xCCF472B6),
                         Color(0xCCFF6B6B),
                       ],
                     )
@@ -1322,8 +1389,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 BoxShadow(
                   color: _isCrystal
                       ? const Color(0x20FFFFFF)
-                      : Color.fromRGBO(
-                          _pri.red, _pri.green, _pri.blue, 0.45),
+                      : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.45),
                   blurRadius: 20,
                   offset: const Offset(0, 6),
                 ),
@@ -1332,8 +1398,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.bolt_rounded,
-                    color: Colors.white, size: 17),
+                Icon(Icons.bolt_rounded, color: Colors.white, size: 17),
                 SizedBox(width: 8),
                 Text(
                   'Chat starten',
@@ -1363,8 +1428,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         children: [
           Row(
             children: [
-              _iconBox(
-                  Icons.auto_graph_rounded, const Color(0xFFF5A623)),
+              _iconBox(Icons.auto_graph_rounded, const Color(0xFFF5A623)),
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
@@ -1384,8 +1448,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   shape: BoxShape.circle,
                   color: Color(0xFFF5A623),
                   boxShadow: [
-                    BoxShadow(
-                        color: Color(0x60F5A623), blurRadius: 4),
+                    BoxShadow(color: Color(0x60F5A623), blurRadius: 4),
                   ],
                 ),
               ),
@@ -1457,17 +1520,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             boxShadow: [
                               BoxShadow(
                                 color: _isCrystal
-                                    ? Color.fromRGBO(
-                                        255,
-                                        255,
-                                        255,
-                                        0.2 +
-                                            _breathCtrl.value * 0.1)
+                                    ? Color.fromRGBO(255, 255, 255,
+                                        0.2 + _breathCtrl.value * 0.1)
                                     : Color.fromRGBO(
-                                        _pri.red,
-                                        _pri.green,
-                                        _pri.blue,
-                                        0.5),
+                                        _pri.red, _pri.green, _pri.blue, 0.5),
                                 blurRadius: 4,
                               ),
                             ],
@@ -1494,8 +1550,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Icons.arrow_forward_ios_rounded,
             color: _isCrystal
                 ? const Color(0x30FFFFFF)
-                : Color.fromRGBO(
-                    _pri.red, _pri.green, _pri.blue, 0.4),
+                : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.4),
             size: 14,
           ),
         ],
@@ -1506,8 +1561,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // ── Helpers ──
   Widget _staggerChild(double stagger, int index, Widget child) {
     final double delay = index * 0.15;
-    final double progress =
-        ((stagger - delay) / (1.0 - delay)).clamp(0.0, 1.0);
+    final double progress = ((stagger - delay) / (1.0 - delay)).clamp(0.0, 1.0);
     final double eased = Curves.easeOutCubic.transform(progress);
     return Opacity(
       opacity: eased,
@@ -1523,82 +1577,84 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // ════════════════════════════════════════════════════
 
   Widget _buildFokusTab() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedBuilder(
-            animation: _breathCtrl,
-            builder: (BuildContext c, Widget? ch) => Transform.scale(
-              scale: 0.92 + _breathCtrl.value * 0.08,
-              child: ch,
-            ),
-            child: Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                gradient: _isCrystal
-                    ? const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
-                      )
-                    : const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0x28F472B6), Color(0x14F472B6)],
-                      ),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: _isCrystal
-                      ? const Color(0x10FFFFFF)
-                      : const Color(0x20F472B6),
-                  width: 0.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 100),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedBuilder(
+              animation: _breathCtrl,
+              builder: (BuildContext c, Widget? ch) => Transform.scale(
+                scale: 0.92 + _breathCtrl.value * 0.08,
+                child: ch,
+              ),
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  gradient: _isCrystal
+                      ? const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0x28F472B6), Color(0x14F472B6)],
+                        ),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
                     color: _isCrystal
-                        ? const Color(0x15FFFFFF)
-                        : const Color(0x30F472B6),
-                    blurRadius: 28,
+                        ? const Color(0x10FFFFFF)
+                        : const Color(0x20F472B6),
+                    width: 0.5,
                   ),
-                ],
+                  boxShadow: [
+                    BoxShadow(
+                      color: _isCrystal
+                          ? const Color(0x15FFFFFF)
+                          : const Color(0x30F472B6),
+                      blurRadius: 28,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.hexagon_rounded,
+                  color: _isCrystal
+                      ? const Color(0xCCFFFFFF)
+                      : const Color(0xFFF472B6),
+                  size: 30,
+                ),
               ),
-              child: Icon(
-                Icons.hexagon_rounded,
-                color: _isCrystal
-                    ? const Color(0xCCFFFFFF)
-                    : const Color(0xFFF472B6),
-                size: 30,
+            ),
+            const SizedBox(height: 22),
+            const Text(
+              'Fokus',
+              style: TextStyle(
+                fontFamily: 'Satoshi',
+                color: AppColors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
               ),
             ),
-          ),
-          const SizedBox(height: 22),
-          const Text(
-            'Fokus',
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              color: AppColors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
+            const SizedBox(height: 8),
+            const Text(
+              'Kommt bald…',
+              style: TextStyle(
+                fontFamily: 'Satoshi',
+                color: AppColors.white30,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Kommt bald…',
-            style: TextStyle(
-              fontFamily: 'Satoshi',
-              color: AppColors.white30,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-
   // ════════════════════════════════════════════════════
   //  ENTITY (Voice Orb)
   // ════════════════════════════════════════════════════
@@ -1613,15 +1669,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     return AnimatedBuilder(
       animation: Listenable.merge([
-        _breathCtrl, _nebulaCtrl, _heartbeatCtrl, _floatCtrl,
-        _sonarCtrl, _waveCtrl, _glowCtrl, _prismaCtrl,
+        _breathCtrl,
+        _nebulaCtrl,
+        _heartbeatCtrl,
+        _floatCtrl,
+        _sonarCtrl,
+        _waveCtrl,
+        _glowCtrl,
+        _prismaCtrl,
       ]),
       builder: (BuildContext context, Widget? child) {
         final double breath = _breathCtrl.value;
         final double nebula = _nebulaCtrl.value;
         final double hb = _heartbeatCtrl.value;
-        final double floatY =
-            math.sin(_floatCtrl.value * math.pi * 2) * 1.8;
+        final double floatY = math.sin(_floatCtrl.value * math.pi * 2) * 1.8;
         final double sonar = _voiceActive ? _sonarCtrl.value : 0.0;
         final double wave = _voiceActive ? _waveCtrl.value : 0.0;
         final double glow = _voiceActive ? _glowCtrl.value : 0.0;
@@ -1660,13 +1721,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               )
                             : _DiamondRingPainter(
                                 size: ringSize,
-                                color: Color.fromRGBO(
-                                    pr, pg, pb, ringOpacity),
+                                color: Color.fromRGBO(pr, pg, pb, ringOpacity),
                                 strokeWidth: 0.8 * (1.0 - phase),
                               ),
                       );
                     }),
-
                   if (_voiceActive)
                     CustomPaint(
                       size: Size(canvasSize, canvasSize),
@@ -1679,7 +1738,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         prisma: prisma,
                       ),
                     ),
-
                   Container(
                     width: baseSize + 20,
                     height: baseSize + 20,
@@ -1689,7 +1747,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           color: _isCrystal
                               ? Color.fromRGBO(255, 255, 255,
                                   _voiceActive ? 0.12 + glow * 0.08 : 0.05)
-                              : Color.fromRGBO(pr, pg, pb,
+                              : Color.fromRGBO(
+                                  pr,
+                                  pg,
+                                  pb,
                                   _voiceActive
                                       ? 0.2 + glow * 0.15 + hbP * 0.05
                                       : 0.08 + hbP * 0.04),
@@ -1698,8 +1759,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                         BoxShadow(
                           color: _isCrystal
-                              ? Color.fromRGBO(255, 255, 255,
-                                  _voiceActive ? 0.06 : 0.02)
+                              ? Color.fromRGBO(
+                                  255, 255, 255, _voiceActive ? 0.06 : 0.02)
                               : Color.fromRGBO(sr, sg, sb,
                                   _voiceActive ? 0.1 + glow * 0.08 : 0.04),
                           blurRadius: 30,
@@ -1707,35 +1768,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-
                   Transform.scale(
                     scale: scale,
                     child: Transform.rotate(
                       angle: math.pi / 4,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            _voiceActive ? 14 : 12),
+                        borderRadius:
+                            BorderRadius.circular(_voiceActive ? 14 : 12),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(
                             sigmaX: _isCrystal ? 16 : 40,
                             sigmaY: _isCrystal ? 16 : 40,
                           ),
                           child: _buildEntityShell(
-                            baseSize, glow, hbP, breath,
-                            pr, pg, pb, prisma,
+                            baseSize,
+                            glow,
+                            hbP,
+                            breath,
+                            pr,
+                            pg,
+                            pb,
+                            prisma,
                           ),
                         ),
                       ),
                     ),
                   ),
-
                   Transform.scale(
                     scale: scale,
                     child: Transform.rotate(
                       angle: math.pi / 4,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            _voiceActive ? 12 : 10),
+                        borderRadius:
+                            BorderRadius.circular(_voiceActive ? 12 : 10),
                         child: SizedBox(
                           width: baseSize - 6,
                           height: baseSize - 6,
@@ -1761,7 +1826,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-
                   Container(
                     width: _voiceActive ? 7 + glow * 2 : 5 + hbP * 1.5,
                     height: _voiceActive ? 7 + glow * 2 : 5 + hbP * 1.5,
@@ -1771,7 +1835,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           _voiceActive ? 0.8 + glow * 0.2 : 0.55 + hbP * 0.2),
                       boxShadow: [
                         BoxShadow(
-                          color: Color.fromRGBO(255, 255, 255,
+                          color: Color.fromRGBO(
+                              255,
+                              255,
+                              255,
                               _voiceActive
                                   ? 0.4 + glow * 0.2
                                   : 0.15 + hbP * 0.1),
@@ -1780,8 +1847,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                         BoxShadow(
                           color: _isCrystal
-                              ? Color.fromRGBO(255, 255, 255,
-                                  _voiceActive ? 0.15 : 0.05)
+                              ? Color.fromRGBO(
+                                  255, 255, 255, _voiceActive ? 0.15 : 0.05)
                               : Color.fromRGBO(
                                   pr, pg, pb, _voiceActive ? 0.3 : 0.1),
                           blurRadius: 16,
@@ -1789,7 +1856,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-
                   Transform.scale(
                     scale: scale,
                     child: Transform.rotate(
@@ -1841,8 +1907,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(_voiceActive ? 14 : 12),
         color: _isCrystal
-            ? Color.fromRGBO(
-                20, 20, 30, _voiceActive ? 0.4 + glow * 0.1 : 0.3)
+            ? Color.fromRGBO(20, 20, 30, _voiceActive ? 0.4 + glow * 0.1 : 0.3)
             : Color.fromRGBO(
                 255, 255, 255, _voiceActive ? 0.06 + glow * 0.03 : 0.04),
         boxShadow: const [
@@ -1867,8 +1932,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 borderColor: _voiceActive
                     ? Color.fromRGBO(255, 255, 255, 0.14 + glow * 0.08)
                     : Color.fromRGBO(255, 255, 255, 0.1 + hbP * 0.03),
-                accentColor: Color.fromRGBO(
-                    pr, pg, pb,
+                accentColor: Color.fromRGBO(pr, pg, pb,
                     _voiceActive ? 0.3 + glow * 0.2 : 0.15 + hbP * 0.1),
                 breath: breath,
                 active: _voiceActive,
@@ -1883,10 +1947,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (t < 0.4) return math.sin((t - 0.25) / 0.15 * math.pi) * 0.7;
     return 0;
   }
-
-  // ════════════════════════════════════════════════════
-  //  NAVIGATION BAR
-  // ════════════════════════════════════════════════════
 
   // ════════════════════════════════════════════════════
   //  NAVIGATION BAR — 3D Glass + flüssige Animationen
@@ -1920,8 +1980,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildNavContent() {
     return AnimatedBuilder(
-      animation: Listenable.merge(
-          [_refractionCtrl, _breathCtrl, _prismaCtrl]),
+      animation: Listenable.merge([_refractionCtrl, _breathCtrl, _prismaCtrl]),
       builder: (BuildContext context, Widget? _) {
         final double pos = _smoothTabAlign;
         final double breath = _breathCtrl.value;
@@ -1965,8 +2024,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   offset: Offset(0, 4),
                 ),
                 BoxShadow(
-                  color: Color.fromRGBO(
-                      255, 255, 255, 0.03 + breath * 0.01),
+                  color: Color.fromRGBO(255, 255, 255, 0.03 + breath * 0.01),
                   blurRadius: 1,
                   offset: const Offset(0, -1),
                 ),
@@ -1976,7 +2034,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 // ═══ TOP HIGHLIGHT ═══
                 Positioned(
-                  top: 0, left: 0, right: 0, height: 1.2,
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1.2,
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.only(
@@ -1999,7 +2060,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                 // ═══ BOTTOM SHADOW ═══
                 Positioned(
-                  bottom: 0, left: 24, right: 24, height: 1,
+                  bottom: 0,
+                  left: 24,
+                  right: 24,
+                  height: 1,
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -2026,11 +2090,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         radius: 0.85,
                         colors: [
                           _isCrystal
-                              ? Color.fromRGBO(255, 255, 255, 0.06 + breath * 0.025)
-                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.09 + breath * 0.035),
+                              ? Color.fromRGBO(
+                                  255, 255, 255, 0.06 + breath * 0.025)
+                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue,
+                                  0.09 + breath * 0.035),
                           _isCrystal
                               ? Color.fromRGBO(255, 255, 255, 0.015)
-                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.02),
+                              : Color.fromRGBO(
+                                  _pri.red, _pri.green, _pri.blue, 0.02),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5, 1.0],
@@ -2051,11 +2118,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         colors: [
                           Colors.transparent,
                           _isCrystal
-                              ? Color.fromRGBO(255, 255, 255, 0.25 + breath * 0.1)
-                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.45 + breath * 0.15),
+                              ? Color.fromRGBO(
+                                  255, 255, 255, 0.25 + breath * 0.1)
+                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue,
+                                  0.45 + breath * 0.15),
                           _isCrystal
-                              ? Color.fromRGBO(255, 255, 255, 0.30 + breath * 0.12)
-                              : Color.fromRGBO(_sec.red, _sec.green, _sec.blue, 0.55 + breath * 0.18),
+                              ? Color.fromRGBO(
+                                  255, 255, 255, 0.30 + breath * 0.12)
+                              : Color.fromRGBO(_sec.red, _sec.green, _sec.blue,
+                                  0.55 + breath * 0.18),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.2, 0.8, 1.0],
@@ -2063,15 +2134,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       boxShadow: [
                         BoxShadow(
                           color: _isCrystal
-                              ? Color.fromRGBO(255, 255, 255, 0.10 + breath * 0.05)
-                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.20 + breath * 0.10),
+                              ? Color.fromRGBO(
+                                  255, 255, 255, 0.10 + breath * 0.05)
+                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue,
+                                  0.20 + breath * 0.10),
                           blurRadius: 10,
                           spreadRadius: 2,
                         ),
                         BoxShadow(
                           color: _isCrystal
                               ? Color.fromRGBO(255, 255, 255, 0.05)
-                              : Color.fromRGBO(_pri.red, _pri.green, _pri.blue, 0.08),
+                              : Color.fromRGBO(
+                                  _pri.red, _pri.green, _pri.blue, 0.08),
                           blurRadius: 20,
                           spreadRadius: 4,
                         ),
@@ -2122,7 +2196,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-    Widget _navItem(int index, IconData icon, String label) {
+  Widget _navItem(int index, IconData icon, String label) {
     final bool active = _currentTabIndex == index;
 
     return GestureDetector(
@@ -2157,13 +2231,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               _isCrystal
                                   ? Color.fromRGBO(255, 255, 255,
                                       0.08 + _breathCtrl.value * 0.03)
-                                  : Color.fromRGBO(_pri.red, _pri.green,
-                                      _pri.blue, 0.12 + _breathCtrl.value * 0.04),
+                                  : Color.fromRGBO(
+                                      _pri.red,
+                                      _pri.green,
+                                      _pri.blue,
+                                      0.12 + _breathCtrl.value * 0.04),
                               _isCrystal
                                   ? Color.fromRGBO(255, 255, 255,
                                       0.03 + _breathCtrl.value * 0.01)
-                                  : Color.fromRGBO(_pri.red, _pri.green,
-                                      _pri.blue, 0.04 + _breathCtrl.value * 0.015),
+                                  : Color.fromRGBO(
+                                      _pri.red,
+                                      _pri.green,
+                                      _pri.blue,
+                                      0.04 + _breathCtrl.value * 0.015),
                             ],
                           )
                         : null,
@@ -2183,8 +2263,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             BoxShadow(
                               color: _isCrystal
                                   ? const Color(0x14FFFFFF)
-                                  : Color.fromRGBO(_pri.red, _pri.green,
-                                      _pri.blue, 0.20),
+                                  : Color.fromRGBO(
+                                      _pri.red, _pri.green, _pri.blue, 0.20),
                               blurRadius: 18,
                             ),
                             const BoxShadow(
@@ -2240,8 +2320,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 BoxShadow(
                                   color: _isCrystal
                                       ? const Color(0x50FFFFFF)
-                                      : Color.fromRGBO(_pri.red, _pri.green,
-                                          _pri.blue, 0.8),
+                                      : Color.fromRGBO(
+                                          _pri.red, _pri.green, _pri.blue, 0.8),
                                   blurRadius: 12,
                                   spreadRadius: 1,
                                 ),
@@ -2262,8 +2342,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 return SweepGradient(
                                   startAngle: _prismaCtrl.value * math.pi * 2,
                                   colors: const [
-                                    Color(0xFFFF6B6B), Color(0xFFFFE66D),
-                                    Color(0xFF4ECDC4), Color(0xFFA78BFA),
+                                    Color(0xFFFF6B6B),
+                                    Color(0xFFFFE66D),
+                                    Color(0xFF4ECDC4),
+                                    Color(0xFFA78BFA),
                                     Color(0xFFFF6B6B),
                                   ],
                                 ).createShader(bounds);
@@ -2320,11 +2402,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-
   List<Color> _rainbowColors(double offset) {
     const List<Color> base = [
-      Color(0xFFFF6B6B), Color(0xFFFFE66D), Color(0xFF4ECDC4),
-      Color(0xFF45B7D1), Color(0xFFA78BFA), Color(0xFFF472B6),
+      Color(0xFFFF6B6B),
+      Color(0xFFFFE66D),
+      Color(0xFF4ECDC4),
+      Color(0xFF45B7D1),
+      Color(0xFFA78BFA),
+      Color(0xFFF472B6),
     ];
     final int shift = (offset * base.length).floor() % base.length;
     return [...base.sublist(shift), ...base.sublist(0, shift)];
@@ -2415,41 +2500,62 @@ class _SettingsScreen extends StatelessWidget {
                       _sectionTitle('ALLGEMEIN'),
                       const SizedBox(height: 8),
                       _settingsCard(context, [
-                        _settingsTile(Icons.person_outline_rounded, 'Konto', 'Name, E-Mail, Passwort', () {}),
+                        _settingsTile(Icons.person_outline_rounded, 'Konto',
+                            'Name, E-Mail, Passwort', () {}),
                         _divider(),
-                        _settingsTile(Icons.notifications_none_rounded, 'Benachrichtigungen', 'Push, E-Mail, Sounds', () {}),
+                        _settingsTile(
+                            Icons.notifications_none_rounded,
+                            'Benachrichtigungen',
+                            'Push, E-Mail, Sounds',
+                            () {}),
                         _divider(),
-                        _settingsTile(Icons.language_rounded, 'Sprache', 'Deutsch', () {}),
+                        _settingsTile(Icons.language_rounded, 'Sprache',
+                            'Deutsch', () {}),
                       ]),
                       const SizedBox(height: 28),
                       _sectionTitle('DARSTELLUNG'),
                       const SizedBox(height: 8),
                       _settingsCard(context, [
-                        _settingsTile(Icons.palette_outlined, 'Atmosphäre', atmo.name, () {
+                        _settingsTile(
+                            Icons.palette_outlined, 'Atmosphäre', atmo.name,
+                            () {
                           AppRouter.pushFade(context, const AtmosphereScreen());
                         }),
                         _divider(),
-                        _settingsTile(Icons.text_fields_rounded, 'Schriftgröße', 'Standard', () {}),
+                        _settingsTile(Icons.text_fields_rounded, 'Schriftgröße',
+                            'Standard', () {}),
                       ]),
                       const SizedBox(height: 28),
                       _sectionTitle('DATEN & PRIVATSPHÄRE'),
                       const SizedBox(height: 8),
                       _settingsCard(context, [
-                        _settingsTile(Icons.shield_outlined, 'Datenschutz', 'Datennutzung & Tracking', () {}),
+                        _settingsTile(Icons.shield_outlined, 'Datenschutz',
+                            'Datennutzung & Tracking', () {}),
                         _divider(),
-                        _settingsTile(Icons.download_rounded, 'Daten exportieren', 'Chats, Aufgaben, Notizen', () {}),
+                        _settingsTile(
+                            Icons.download_rounded,
+                            'Daten exportieren',
+                            'Chats, Aufgaben, Notizen',
+                            () {}),
                         _divider(),
-                        _settingsTile(Icons.delete_outline_rounded, 'Daten löschen', 'Alle lokalen Daten entfernen', () {}),
+                        _settingsTile(
+                            Icons.delete_outline_rounded,
+                            'Daten löschen',
+                            'Alle lokalen Daten entfernen',
+                            () {}),
                       ]),
                       const SizedBox(height: 28),
                       _sectionTitle('INFO'),
                       const SizedBox(height: 8),
                       _settingsCard(context, [
-                        _settingsTile(Icons.info_outline_rounded, 'Über Nexiia', 'Version 1.0.0', () {}),
+                        _settingsTile(Icons.info_outline_rounded, 'Über Nexiia',
+                            'Version 1.0.0', () {}),
                         _divider(),
-                        _settingsTile(Icons.description_outlined, 'Nutzungsbedingungen', '', () {}),
+                        _settingsTile(Icons.description_outlined,
+                            'Nutzungsbedingungen', '', () {}),
                         _divider(),
-                        _settingsTile(Icons.help_outline_rounded, 'Hilfe & Support', '', () {}),
+                        _settingsTile(Icons.help_outline_rounded,
+                            'Hilfe & Support', '', () {}),
                       ]),
                       const SizedBox(height: 32),
                       GestureDetector(
@@ -2463,17 +2569,22 @@ class _SettingsScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: const Color(0x15FF453A),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0x25FF453A), width: 0.5),
+                            border: Border.all(
+                                color: const Color(0x25FF453A), width: 0.5),
                           ),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.logout_rounded, color: Color(0xFFFF453A), size: 18),
+                              Icon(Icons.logout_rounded,
+                                  color: Color(0xFFFF453A), size: 18),
                               SizedBox(width: 8),
-                              Text('Abmelden', style: TextStyle(
-                                fontFamily: 'Satoshi', color: Color(0xFFFF453A),
-                                fontSize: 15, fontWeight: FontWeight.w600,
-                              )),
+                              Text('Abmelden',
+                                  style: TextStyle(
+                                    fontFamily: 'Satoshi',
+                                    color: Color(0xFFFF453A),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  )),
                             ],
                           ),
                         ),
@@ -2493,10 +2604,14 @@ class _SettingsScreen extends StatelessWidget {
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4),
-      child: Text(title, style: const TextStyle(
-        fontFamily: 'Satoshi', color: AppColors.white30,
-        fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.2,
-      )),
+      child: Text(title,
+          style: const TextStyle(
+            fontFamily: 'Satoshi',
+            color: AppColors.white30,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+          )),
     );
   }
 
@@ -2507,7 +2622,8 @@ class _SettingsScreen extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
-            color: isCrystal ? const Color(0x14101018) : const Color(0x0CFFFFFF),
+            color:
+                isCrystal ? const Color(0x14101018) : const Color(0x0CFFFFFF),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: const Color(0x0AFFFFFF), width: 0.5),
           ),
@@ -2517,7 +2633,8 @@ class _SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _settingsTile(IconData icon, String title, String subtitle, VoidCallback onTap) {
+  Widget _settingsTile(
+      IconData icon, String title, String subtitle, VoidCallback onTap) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -2529,7 +2646,8 @@ class _SettingsScreen extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: const Color(0x0AFFFFFF),
                 borderRadius: BorderRadius.circular(10),
@@ -2542,21 +2660,28 @@ class _SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(
-                    fontFamily: 'Satoshi', color: AppColors.white80,
-                    fontSize: 15, fontWeight: FontWeight.w600,
-                  )),
+                  Text(title,
+                      style: const TextStyle(
+                        fontFamily: 'Satoshi',
+                        color: AppColors.white80,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      )),
                   if (subtitle.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(
-                      fontFamily: 'Satoshi', color: AppColors.white30,
-                      fontSize: 12, fontWeight: FontWeight.w400,
-                    )),
+                    Text(subtitle,
+                        style: const TextStyle(
+                          fontFamily: 'Satoshi',
+                          color: AppColors.white30,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        )),
                   ],
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0x22FFFFFF)),
+            const Icon(Icons.chevron_right_rounded,
+                size: 18, color: Color(0x22FFFFFF)),
           ],
         ),
       ),
@@ -2588,8 +2713,8 @@ class _Glass3DBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final RRect outer = RRect.fromLTRBR(
-        0, 0, size.width, size.height, Radius.circular(radius));
+    final RRect outer =
+        RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(radius));
 
     final Paint borderPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -2692,7 +2817,8 @@ class _Glass3DBorderPainter extends CustomPainter {
             Color.fromRGBO(255, 255, 255, 0.03 + breathVal * 0.01),
             const Color(0x00FFFFFF),
           ],
-        ).createShader(Rect.fromLTWH(size.width - 1, radius, 1, size.height - radius * 2))
+        ).createShader(
+            Rect.fromLTWH(size.width - 1, radius, 1, size.height - radius * 2))
         ..strokeWidth = 0.4,
     );
   }
@@ -2715,44 +2841,53 @@ class _CrystalBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final RRect rrect = RRect.fromLTRBR(
-        0, 0, size.width, size.height, Radius.circular(radius));
+    final RRect rrect =
+        RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(radius));
 
-    canvas.drawRRect(rrect, Paint()
-      ..color = Color.fromRGBO(255, 255, 255, 0.06 + breathVal * 0.02)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.5);
+    canvas.drawRRect(
+        rrect,
+        Paint()
+          ..color = Color.fromRGBO(255, 255, 255, 0.06 + breathVal * 0.02)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.5);
 
     const double inset = 1.5;
-    final RRect inner = RRect.fromLTRBR(inset, inset, size.width - inset, size.height - inset, Radius.circular(radius - 1));
+    final RRect inner = RRect.fromLTRBR(inset, inset, size.width - inset,
+        size.height - inset, Radius.circular(radius - 1));
     final double opacity = 0.08 + breathVal * 0.04;
 
-    canvas.drawRRect(inner, Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.6
-      ..shader = SweepGradient(
-        startAngle: refraction * math.pi * 2,
-        colors: [
-          Color.fromRGBO(255, 107, 107, opacity),
-          Color.fromRGBO(255, 230, 109, opacity * 1.2),
-          Color.fromRGBO(78, 205, 196, opacity),
-          Color.fromRGBO(69, 183, 209, opacity * 1.1),
-          Color.fromRGBO(167, 139, 250, opacity),
-          Color.fromRGBO(244, 114, 182, opacity * 0.9),
-          Color.fromRGBO(255, 107, 107, opacity),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
+    canvas.drawRRect(
+        inner,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.6
+          ..shader = SweepGradient(
+            startAngle: refraction * math.pi * 2,
+            colors: [
+              Color.fromRGBO(255, 107, 107, opacity),
+              Color.fromRGBO(255, 230, 109, opacity * 1.2),
+              Color.fromRGBO(78, 205, 196, opacity),
+              Color.fromRGBO(69, 183, 209, opacity * 1.1),
+              Color.fromRGBO(167, 139, 250, opacity),
+              Color.fromRGBO(244, 114, 182, opacity * 0.9),
+              Color.fromRGBO(255, 107, 107, opacity),
+            ],
+          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
 
     final double specW = size.width * 0.4;
-    final double specX = (size.width - specW) / 2 + math.sin(refraction * math.pi * 2) * 10;
-    canvas.drawLine(Offset(specX, 0.5), Offset(specX + specW, 0.5), Paint()
-      ..shader = LinearGradient(colors: [
-        const Color(0x00FFFFFF),
-        Color.fromRGBO(255, 255, 255, 0.12 + breathVal * 0.06),
-        const Color(0x00FFFFFF),
-      ]).createShader(Rect.fromLTWH(specX, 0, specW, 1))
-      ..strokeWidth = 0.8
-      ..strokeCap = StrokeCap.round);
+    final double specX =
+        (size.width - specW) / 2 + math.sin(refraction * math.pi * 2) * 10;
+    canvas.drawLine(
+        Offset(specX, 0.5),
+        Offset(specX + specW, 0.5),
+        Paint()
+          ..shader = LinearGradient(colors: [
+            const Color(0x00FFFFFF),
+            Color.fromRGBO(255, 255, 255, 0.12 + breathVal * 0.06),
+            const Color(0x00FFFFFF),
+          ]).createShader(Rect.fromLTWH(specX, 0, specW, 1))
+          ..strokeWidth = 0.8
+          ..strokeCap = StrokeCap.round);
   }
 
   @override
@@ -2771,9 +2906,11 @@ class _CrystalRefractionOverlay extends CustomPainter {
     for (int i = 0; i < 5; i++) {
       final double phase = t * tau + i * 1.3;
       final double cx = size.width * (0.2 + i * 0.15) + math.sin(phase) * 30;
-      final double cy = size.height * (0.15 + i * 0.16) + math.cos(phase * 0.7) * 25;
+      final double cy =
+          size.height * (0.15 + i * 0.16) + math.cos(phase * 0.7) * 25;
       final double r = 60 + math.sin(phase * 0.5 + i) * 20;
-      final double opacity = 0.015 + breath * 0.008 + math.sin(phase).abs() * 0.005;
+      final double opacity =
+          0.015 + breath * 0.008 + math.sin(phase).abs() * 0.005;
       final List<Color> colors = [
         Color.fromRGBO(255, 107, 107, opacity),
         Color.fromRGBO(255, 230, 109, opacity),
@@ -2781,10 +2918,15 @@ class _CrystalRefractionOverlay extends CustomPainter {
         Color.fromRGBO(167, 139, 250, opacity),
       ];
       final Offset center = Offset(cx, cy);
-      canvas.drawCircle(center, r, Paint()
-        ..shader = RadialGradient(colors: [colors[i % colors.length], const Color(0x00000000)])
-            .createShader(Rect.fromCircle(center: center, radius: r))
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 50));
+      canvas.drawCircle(
+          center,
+          r,
+          Paint()
+            ..shader = RadialGradient(colors: [
+              colors[i % colors.length],
+              const Color(0x00000000)
+            ]).createShader(Rect.fromCircle(center: center, radius: r))
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 50));
     }
     final double streakX = size.width * (0.3 + math.sin(t * tau) * 0.2);
     final double streakOpacity = 0.02 + breath * 0.01;
@@ -2792,71 +2934,118 @@ class _CrystalRefractionOverlay extends CustomPainter {
     canvas.translate(streakX, 0);
     canvas.rotate(math.pi / 6);
     canvas.drawRect(
-      Rect.fromLTWH(-1, -size.height * 0.2, 2, size.height * 0.8),
-      Paint()..shader = LinearGradient(
-        begin: Alignment.topCenter, end: Alignment.bottomCenter,
-        colors: [const Color(0x00FFFFFF), Color.fromRGBO(255, 255, 255, streakOpacity),
-          Color.fromRGBO(255, 255, 255, streakOpacity * 1.5),
-          Color.fromRGBO(255, 255, 255, streakOpacity), const Color(0x00FFFFFF)],
-      ).createShader(Rect.fromLTWH(-1, -size.height * 0.2, 2, size.height * 0.8)));
+        Rect.fromLTWH(-1, -size.height * 0.2, 2, size.height * 0.8),
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0x00FFFFFF),
+              Color.fromRGBO(255, 255, 255, streakOpacity),
+              Color.fromRGBO(255, 255, 255, streakOpacity * 1.5),
+              Color.fromRGBO(255, 255, 255, streakOpacity),
+              const Color(0x00FFFFFF)
+            ],
+          ).createShader(
+              Rect.fromLTWH(-1, -size.height * 0.2, 2, size.height * 0.8)));
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant _CrystalRefractionOverlay old) => old.t != t || old.breath != breath;
+  bool shouldRepaint(covariant _CrystalRefractionOverlay old) =>
+      old.t != t || old.breath != breath;
 }
 
 class _CrystalEntityBorderPainter extends CustomPainter {
   final double radius, breath, prisma, glow;
   final bool active;
-  const _CrystalEntityBorderPainter({required this.radius, required this.breath, required this.active, required this.prisma, required this.glow});
+  const _CrystalEntityBorderPainter(
+      {required this.radius,
+      required this.breath,
+      required this.active,
+      required this.prisma,
+      required this.glow});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final RRect rrect = RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(radius));
-    canvas.drawRRect(rrect, Paint()
-      ..color = Color.fromRGBO(255, 255, 255, active ? 0.08 + glow * 0.04 : 0.05 + breath * 0.02)
-      ..style = PaintingStyle.stroke..strokeWidth = 0.5);
+    final RRect rrect =
+        RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(radius));
+    canvas.drawRRect(
+        rrect,
+        Paint()
+          ..color = Color.fromRGBO(
+              255, 255, 255, active ? 0.08 + glow * 0.04 : 0.05 + breath * 0.02)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.5);
     const double inset = 2.5;
-    final RRect inner = RRect.fromLTRBR(inset, inset, size.width - inset, size.height - inset, Radius.circular(radius - 1.5));
-    final double opacity = active ? 0.18 + glow * 0.1 + breath * 0.06 : 0.08 + breath * 0.04;
-    canvas.drawRRect(inner, Paint()..style = PaintingStyle.stroke..strokeWidth = 0.7
-      ..shader = SweepGradient(startAngle: prisma * math.pi * 2, colors: [
-        Color.fromRGBO(255, 107, 107, opacity), Color.fromRGBO(255, 230, 109, opacity * 1.2),
-        Color.fromRGBO(78, 205, 196, opacity), Color.fromRGBO(69, 183, 209, opacity * 1.1),
-        Color.fromRGBO(167, 139, 250, opacity), Color.fromRGBO(244, 114, 182, opacity * 0.9),
-        Color.fromRGBO(255, 107, 107, opacity),
-      ]).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
+    final RRect inner = RRect.fromLTRBR(inset, inset, size.width - inset,
+        size.height - inset, Radius.circular(radius - 1.5));
+    final double opacity =
+        active ? 0.18 + glow * 0.1 + breath * 0.06 : 0.08 + breath * 0.04;
+    canvas.drawRRect(
+        inner,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.7
+          ..shader = SweepGradient(startAngle: prisma * math.pi * 2, colors: [
+            Color.fromRGBO(255, 107, 107, opacity),
+            Color.fromRGBO(255, 230, 109, opacity * 1.2),
+            Color.fromRGBO(78, 205, 196, opacity),
+            Color.fromRGBO(69, 183, 209, opacity * 1.1),
+            Color.fromRGBO(167, 139, 250, opacity),
+            Color.fromRGBO(244, 114, 182, opacity * 0.9),
+            Color.fromRGBO(255, 107, 107, opacity),
+          ]).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
   }
 
   @override
-  bool shouldRepaint(covariant _CrystalEntityBorderPainter old) => old.breath != breath || old.active != active || old.prisma != prisma || old.glow != glow;
+  bool shouldRepaint(covariant _CrystalEntityBorderPainter old) =>
+      old.breath != breath ||
+      old.active != active ||
+      old.prisma != prisma ||
+      old.glow != glow;
 }
 
 class _CrystalNebulaPainter extends CustomPainter {
   final double rotation, intensity, prisma;
-  const _CrystalNebulaPainter({required this.rotation, required this.intensity, required this.prisma});
+  const _CrystalNebulaPainter(
+      {required this.rotation, required this.intensity, required this.prisma});
 
   @override
   void paint(Canvas canvas, Size size) {
     final Offset center = Offset(size.width / 2, size.height / 2);
     final double r = size.width / 2;
-    canvas.drawCircle(center, r, Paint()
-      ..shader = SweepGradient(center: Alignment.center, startAngle: rotation, endAngle: rotation + math.pi * 2, colors: [
-        Color.fromRGBO(255, 255, 255, intensity), Color.fromRGBO(200, 220, 255, intensity * 0.7),
-        Color.fromRGBO(255, 200, 200, intensity * 0.4), Color.fromRGBO(200, 255, 220, intensity * 0.3),
-        Color.fromRGBO(220, 200, 255, intensity * 0.5), Color.fromRGBO(255, 255, 255, intensity),
-      ]).createShader(Rect.fromCircle(center: center, radius: r))
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
+    canvas.drawCircle(
+        center,
+        r,
+        Paint()
+          ..shader = SweepGradient(
+              center: Alignment.center,
+              startAngle: rotation,
+              endAngle: rotation + math.pi * 2,
+              colors: [
+                Color.fromRGBO(255, 255, 255, intensity),
+                Color.fromRGBO(200, 220, 255, intensity * 0.7),
+                Color.fromRGBO(255, 200, 200, intensity * 0.4),
+                Color.fromRGBO(200, 255, 220, intensity * 0.3),
+                Color.fromRGBO(220, 200, 255, intensity * 0.5),
+                Color.fromRGBO(255, 255, 255, intensity),
+              ]).createShader(Rect.fromCircle(center: center, radius: r))
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
   }
 
   @override
-  bool shouldRepaint(covariant _CrystalNebulaPainter old) => old.rotation != rotation || old.intensity != intensity;
+  bool shouldRepaint(covariant _CrystalNebulaPainter old) =>
+      old.rotation != rotation || old.intensity != intensity;
 }
 
 class _CrystalSonarPainter extends CustomPainter {
   final double size, phase, prisma, strokeWidth;
-  const _CrystalSonarPainter({required this.size, required this.phase, required this.prisma, required this.strokeWidth});
+  const _CrystalSonarPainter(
+      {required this.size,
+      required this.phase,
+      required this.prisma,
+      required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -2867,56 +3056,141 @@ class _CrystalSonarPainter extends CustomPainter {
     canvas.translate(cx, cy);
     canvas.rotate(math.pi / 4);
     canvas.translate(-cx, -cy);
-    canvas.drawRRect(RRect.fromLTRBR(cx - half, cy - half, cx + half, cy + half, Radius.circular(cornerR)),
-      Paint()..style = PaintingStyle.stroke..strokeWidth = strokeWidth
-        ..shader = SweepGradient(startAngle: prisma * math.pi * 2, colors: [
-          Color.fromRGBO(255, 107, 107, opacity), Color.fromRGBO(255, 230, 109, opacity),
-          Color.fromRGBO(78, 205, 196, opacity), Color.fromRGBO(167, 139, 250, opacity),
-          Color.fromRGBO(255, 107, 107, opacity),
-        ]).createShader(Rect.fromLTWH(cx - half, cy - half, size, size)));
+    canvas.drawRRect(
+        RRect.fromLTRBR(cx - half, cy - half, cx + half, cy + half,
+            Radius.circular(cornerR)),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..shader = SweepGradient(startAngle: prisma * math.pi * 2, colors: [
+            Color.fromRGBO(255, 107, 107, opacity),
+            Color.fromRGBO(255, 230, 109, opacity),
+            Color.fromRGBO(78, 205, 196, opacity),
+            Color.fromRGBO(167, 139, 250, opacity),
+            Color.fromRGBO(255, 107, 107, opacity),
+          ]).createShader(Rect.fromLTWH(cx - half, cy - half, size, size)));
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant _CrystalSonarPainter old) => old.size != size || old.phase != phase || old.prisma != prisma;
+  bool shouldRepaint(covariant _CrystalSonarPainter old) =>
+      old.size != size || old.phase != phase || old.prisma != prisma;
 }
 
 class _AuroraBgPainter extends CustomPainter {
   final double t;
   final Color pri, sec, glo;
   final bool isCrystal;
-  const _AuroraBgPainter({required this.t, required this.pri, required this.sec, required this.glo, required this.isCrystal});
+  const _AuroraBgPainter(
+      {required this.t,
+      required this.pri,
+      required this.sec,
+      required this.glo,
+      required this.isCrystal});
 
   @override
   void paint(Canvas canvas, Size size) {
     final double tau = math.pi * 2;
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()
-      ..shader = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: isCrystal
-        ? [AppColors.background, const Color(0xFF0A0A14), const Color(0xFF080810), AppColors.background]
-        : [AppColors.background, Color.fromRGBO(pri.red, pri.green, pri.blue, 0.03), AppColors.background]
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Paint()
+          ..shader = LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isCrystal
+                      ? [
+                          AppColors.background,
+                          const Color(0xFF0A0A14),
+                          const Color(0xFF080810),
+                          AppColors.background
+                        ]
+                      : [
+                          AppColors.background,
+                          Color.fromRGBO(pri.red, pri.green, pri.blue, 0.03),
+                          AppColors.background
+                        ])
+              .createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
 
     if (isCrystal) {
-      _blob(canvas, size.width * 0.15 + math.sin(t * tau) * 35, size.height * 0.08 + math.cos(t * tau) * 20, 180, const Color(0x0AB8D4F0));
-      _blob(canvas, size.width * 0.85 + math.cos(t * tau + 1.2) * 30, size.height * 0.3 + math.sin(t * tau + 1.2) * 25, 150, const Color(0x08C0C8D8));
-      _blob(canvas, size.width * 0.5 + math.sin(t * tau + 2.5) * 20, size.height * 0.55 + math.cos(t * tau + 2.5) * 22, 130, const Color(0x08E8ECF4));
-      _blob(canvas, size.width * 0.25 + math.cos(t * tau + 3.8) * 18, size.height * 0.8 + math.sin(t * tau + 3.8) * 16, 100, const Color(0x06D4BEE0));
-      _blob(canvas, size.width * 0.7 + math.sin(t * tau + 4.5) * 25, size.height * 0.15 + math.cos(t * tau + 4.5) * 15, 120, const Color(0x06A0B8D0));
+      _blob(
+          canvas,
+          size.width * 0.15 + math.sin(t * tau) * 35,
+          size.height * 0.08 + math.cos(t * tau) * 20,
+          180,
+          const Color(0x0AB8D4F0));
+      _blob(
+          canvas,
+          size.width * 0.85 + math.cos(t * tau + 1.2) * 30,
+          size.height * 0.3 + math.sin(t * tau + 1.2) * 25,
+          150,
+          const Color(0x08C0C8D8));
+      _blob(
+          canvas,
+          size.width * 0.5 + math.sin(t * tau + 2.5) * 20,
+          size.height * 0.55 + math.cos(t * tau + 2.5) * 22,
+          130,
+          const Color(0x08E8ECF4));
+      _blob(
+          canvas,
+          size.width * 0.25 + math.cos(t * tau + 3.8) * 18,
+          size.height * 0.8 + math.sin(t * tau + 3.8) * 16,
+          100,
+          const Color(0x06D4BEE0));
+      _blob(
+          canvas,
+          size.width * 0.7 + math.sin(t * tau + 4.5) * 25,
+          size.height * 0.15 + math.cos(t * tau + 4.5) * 15,
+          120,
+          const Color(0x06A0B8D0));
     } else {
-      _blob(canvas, size.width * 0.12 + math.sin(t * tau) * 40, size.height * 0.06 + math.cos(t * tau) * 25, 200, Color.fromRGBO(pri.red, pri.green, pri.blue, 0.12));
-      _blob(canvas, size.width * 0.88 + math.cos(t * tau + 1.2) * 35, size.height * 0.28 + math.sin(t * tau + 1.2) * 30, 170, Color.fromRGBO(sec.red, sec.green, sec.blue, 0.09));
-      _blob(canvas, size.width * 0.5 + math.sin(t * tau + 2.5) * 25, size.height * 0.55 + math.cos(t * tau + 2.5) * 25, 150, const Color(0x1406B6D4));
-      _blob(canvas, size.width * 0.25 + math.cos(t * tau + 3.8) * 20, size.height * 0.82 + math.sin(t * tau + 3.8) * 18, 130, const Color(0x0EF472B6));
-      _blob(canvas, size.width * 0.7 + math.sin(t * tau + 5.0) * 15, size.height * 0.42 + math.cos(t * tau + 5.0) * 20, 120, Color.fromRGBO(glo.red, glo.green, glo.blue, 0.07));
-      _blob(canvas, size.width * 0.35 + math.cos(t * tau + 6.0) * 30, size.height * 0.18 + math.sin(t * tau + 6.0) * 15, 160, Color.fromRGBO(pri.red, pri.green, pri.blue, 0.06));
+      _blob(
+          canvas,
+          size.width * 0.12 + math.sin(t * tau) * 40,
+          size.height * 0.06 + math.cos(t * tau) * 25,
+          200,
+          Color.fromRGBO(pri.red, pri.green, pri.blue, 0.12));
+      _blob(
+          canvas,
+          size.width * 0.88 + math.cos(t * tau + 1.2) * 35,
+          size.height * 0.28 + math.sin(t * tau + 1.2) * 30,
+          170,
+          Color.fromRGBO(sec.red, sec.green, sec.blue, 0.09));
+      _blob(
+          canvas,
+          size.width * 0.5 + math.sin(t * tau + 2.5) * 25,
+          size.height * 0.55 + math.cos(t * tau + 2.5) * 25,
+          150,
+          const Color(0x1406B6D4));
+      _blob(
+          canvas,
+          size.width * 0.25 + math.cos(t * tau + 3.8) * 20,
+          size.height * 0.82 + math.sin(t * tau + 3.8) * 18,
+          130,
+          const Color(0x0EF472B6));
+      _blob(
+          canvas,
+          size.width * 0.7 + math.sin(t * tau + 5.0) * 15,
+          size.height * 0.42 + math.cos(t * tau + 5.0) * 20,
+          120,
+          Color.fromRGBO(glo.red, glo.green, glo.blue, 0.07));
+      _blob(
+          canvas,
+          size.width * 0.35 + math.cos(t * tau + 6.0) * 30,
+          size.height * 0.18 + math.sin(t * tau + 6.0) * 15,
+          160,
+          Color.fromRGBO(pri.red, pri.green, pri.blue, 0.06));
     }
   }
 
   void _blob(Canvas canvas, double cx, double cy, double r, Color color) {
     final Offset center = Offset(cx, cy);
-    canvas.drawCircle(center, r, Paint()
-      ..shader = RadialGradient(colors: [color, const Color(0x00000000)]).createShader(Rect.fromCircle(center: center, radius: r))
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 70));
+    canvas.drawCircle(
+        center,
+        r,
+        Paint()
+          ..shader = RadialGradient(colors: [color, const Color(0x00000000)])
+              .createShader(Rect.fromCircle(center: center, radius: r))
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 70));
   }
 
   @override
@@ -2927,58 +3201,92 @@ class _AccentLinePainter extends CustomPainter {
   final double radius, breath;
   final Color borderColor, accentColor;
   final bool active;
-  const _AccentLinePainter({required this.radius, required this.borderColor, required this.accentColor, required this.breath, required this.active});
+  const _AccentLinePainter(
+      {required this.radius,
+      required this.borderColor,
+      required this.accentColor,
+      required this.breath,
+      required this.active});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final RRect rrect = RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(radius));
-    canvas.drawRRect(rrect, Paint()..color = borderColor..style = PaintingStyle.stroke..strokeWidth = 0.5);
+    final RRect rrect =
+        RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(radius));
+    canvas.drawRRect(
+        rrect,
+        Paint()
+          ..color = borderColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.5);
     const double inset = 3.0;
-    final RRect inner = RRect.fromLTRBR(inset, inset, size.width - inset, size.height - inset, Radius.circular(radius - 2));
+    final RRect inner = RRect.fromLTRBR(inset, inset, size.width - inset,
+        size.height - inset, Radius.circular(radius - 2));
     final double opacity = active ? 0.3 + breath * 0.15 : 0.12 + breath * 0.08;
-    canvas.drawRRect(inner, Paint()..style = PaintingStyle.stroke..strokeWidth = 0.8
-      ..shader = SweepGradient(colors: [
-        Color.fromRGBO(255, 255, 255, opacity),
-        Color.fromRGBO(accentColor.red, accentColor.green, accentColor.blue, opacity * 1.5),
-        Color.fromRGBO(255, 255, 255, opacity * 0.5),
-        Color.fromRGBO(accentColor.red, accentColor.green, accentColor.blue, opacity * 0.8),
-        Color.fromRGBO(255, 255, 255, opacity),
-      ]).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
+    canvas.drawRRect(
+        inner,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.8
+          ..shader = SweepGradient(colors: [
+            Color.fromRGBO(255, 255, 255, opacity),
+            Color.fromRGBO(accentColor.red, accentColor.green, accentColor.blue,
+                opacity * 1.5),
+            Color.fromRGBO(255, 255, 255, opacity * 0.5),
+            Color.fromRGBO(accentColor.red, accentColor.green, accentColor.blue,
+                opacity * 0.8),
+            Color.fromRGBO(255, 255, 255, opacity),
+          ]).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
   }
 
   @override
-  bool shouldRepaint(covariant _AccentLinePainter old) => old.breath != breath || old.active != active || old.accentColor != accentColor;
+  bool shouldRepaint(covariant _AccentLinePainter old) =>
+      old.breath != breath ||
+      old.active != active ||
+      old.accentColor != accentColor;
 }
 
 class _NebulaPainter extends CustomPainter {
   final double rotation, intensity;
   final Color pri, sec;
-  const _NebulaPainter({required this.rotation, required this.intensity, required this.pri, required this.sec});
+  const _NebulaPainter(
+      {required this.rotation,
+      required this.intensity,
+      required this.pri,
+      required this.sec});
 
   @override
   void paint(Canvas canvas, Size size) {
     final Offset center = Offset(size.width / 2, size.height / 2);
     final double r = size.width / 2;
-    canvas.drawCircle(center, r, Paint()
-      ..shader = SweepGradient(center: Alignment.center, startAngle: rotation, endAngle: rotation + math.pi * 2, colors: [
-        Color.fromRGBO(pri.red, pri.green, pri.blue, intensity),
-        Color.fromRGBO(sec.red, sec.green, sec.blue, intensity * 0.8),
-        Color.fromRGBO(6, 182, 212, intensity * 0.5),
-        Color.fromRGBO(pri.red, pri.green, pri.blue, intensity * 0.4),
-        Color.fromRGBO(sec.red, sec.green, sec.blue, intensity * 0.7),
-        Color.fromRGBO(pri.red, pri.green, pri.blue, intensity),
-      ]).createShader(Rect.fromCircle(center: center, radius: r))
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
+    canvas.drawCircle(
+        center,
+        r,
+        Paint()
+          ..shader = SweepGradient(
+              center: Alignment.center,
+              startAngle: rotation,
+              endAngle: rotation + math.pi * 2,
+              colors: [
+                Color.fromRGBO(pri.red, pri.green, pri.blue, intensity),
+                Color.fromRGBO(sec.red, sec.green, sec.blue, intensity * 0.8),
+                Color.fromRGBO(6, 182, 212, intensity * 0.5),
+                Color.fromRGBO(pri.red, pri.green, pri.blue, intensity * 0.4),
+                Color.fromRGBO(sec.red, sec.green, sec.blue, intensity * 0.7),
+                Color.fromRGBO(pri.red, pri.green, pri.blue, intensity),
+              ]).createShader(Rect.fromCircle(center: center, radius: r))
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
   }
 
   @override
-  bool shouldRepaint(covariant _NebulaPainter old) => old.rotation != rotation || old.intensity != intensity;
+  bool shouldRepaint(covariant _NebulaPainter old) =>
+      old.rotation != rotation || old.intensity != intensity;
 }
 
 class _DiamondRingPainter extends CustomPainter {
   final double size, strokeWidth;
   final Color color;
-  const _DiamondRingPainter({required this.size, required this.color, required this.strokeWidth});
+  const _DiamondRingPainter(
+      {required this.size, required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -2988,20 +3296,32 @@ class _DiamondRingPainter extends CustomPainter {
     canvas.translate(cx, cy);
     canvas.rotate(math.pi / 4);
     canvas.translate(-cx, -cy);
-    canvas.drawRRect(RRect.fromLTRBR(cx - half, cy - half, cx + half, cy + half, Radius.circular(cornerR)),
-      Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = strokeWidth);
+    canvas.drawRRect(
+        RRect.fromLTRBR(cx - half, cy - half, cx + half, cy + half,
+            Radius.circular(cornerR)),
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth);
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant _DiamondRingPainter old) => old.size != size || old.color != color;
+  bool shouldRepaint(covariant _DiamondRingPainter old) =>
+      old.size != size || old.color != color;
 }
 
 class _EntityFreqPainter extends CustomPainter {
   final double t, glow, entitySize, prisma;
   final Color pri;
   final bool isCrystal;
-  const _EntityFreqPainter({required this.t, required this.glow, required this.entitySize, required this.pri, required this.isCrystal, required this.prisma});
+  const _EntityFreqPainter(
+      {required this.t,
+      required this.glow,
+      required this.entitySize,
+      required this.pri,
+      required this.isCrystal,
+      required this.prisma});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -3019,24 +3339,40 @@ class _EntityFreqPainter extends CustomPainter {
       final double endX = cx + math.cos(angle) * (dist + amp);
       final double endY = cy + math.sin(angle) * (dist + amp);
       final double thickness = 1.2 + math.sin(phase + i * 0.4).abs() * 0.6;
-      final double opacity = 0.3 + glow * 0.3 + math.sin(phase + i * 0.5).abs() * 0.2;
+      final double opacity =
+          0.3 + glow * 0.3 + math.sin(phase + i * 0.5).abs() * 0.2;
       Color lineColor;
       if (isCrystal) {
         final double hue = ((prisma + i / count) % 1.0);
-        const List<Color> rainbow = [Color(0xFFFF6B6B), Color(0xFFFFE66D), Color(0xFF4ECDC4), Color(0xFF45B7D1), Color(0xFFA78BFA), Color(0xFFF472B6)];
+        const List<Color> rainbow = [
+          Color(0xFFFF6B6B),
+          Color(0xFFFFE66D),
+          Color(0xFF4ECDC4),
+          Color(0xFF45B7D1),
+          Color(0xFFA78BFA),
+          Color(0xFFF472B6)
+        ];
         final int idx = (hue * rainbow.length).floor() % rainbow.length;
         final Color base = rainbow[idx];
-        lineColor = Color.fromRGBO(base.red, base.green, base.blue, opacity * 0.7);
+        lineColor =
+            Color.fromRGBO(base.red, base.green, base.blue, opacity * 0.7);
       } else {
-        lineColor = Color.fromRGBO(((255 + pri.red) ~/ 2), ((255 + pri.green) ~/ 2), ((255 + pri.blue) ~/ 2), opacity);
+        lineColor = Color.fromRGBO(((255 + pri.red) ~/ 2),
+            ((255 + pri.green) ~/ 2), ((255 + pri.blue) ~/ 2), opacity);
       }
-      canvas.drawLine(Offset(startX, startY), Offset(endX, endY),
-        Paint()..color = lineColor..strokeWidth = thickness..strokeCap = StrokeCap.round);
+      canvas.drawLine(
+          Offset(startX, startY),
+          Offset(endX, endY),
+          Paint()
+            ..color = lineColor
+            ..strokeWidth = thickness
+            ..strokeCap = StrokeCap.round);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _EntityFreqPainter old) => old.t != t || old.glow != glow || old.prisma != prisma;
+  bool shouldRepaint(covariant _EntityFreqPainter old) =>
+      old.t != t || old.glow != glow || old.prisma != prisma;
 }
 
 class _GlassTap extends StatefulWidget {
@@ -3048,7 +3384,8 @@ class _GlassTap extends StatefulWidget {
   State<_GlassTap> createState() => _GlassTapState();
 }
 
-class _GlassTapState extends State<_GlassTap> with SingleTickerProviderStateMixin {
+class _GlassTapState extends State<_GlassTap>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _scale;
   late Animation<double> _opacity;
@@ -3056,9 +3393,14 @@ class _GlassTapState extends State<_GlassTap> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 80), reverseDuration: const Duration(milliseconds: 180));
-    _scale = Tween<double>(begin: 1.0, end: 0.97).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
-    _opacity = Tween<double>(begin: 1.0, end: 0.85).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+    _ctrl = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 80),
+        reverseDuration: const Duration(milliseconds: 180));
+    _scale = Tween<double>(begin: 1.0, end: 0.97)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+    _opacity = Tween<double>(begin: 1.0, end: 0.85)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -3071,7 +3413,10 @@ class _GlassTapState extends State<_GlassTap> with SingleTickerProviderStateMixi
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) => _ctrl.forward(),
-      onTapUp: (_) { _ctrl.reverse(); widget.onTap(); },
+      onTapUp: (_) {
+        _ctrl.reverse();
+        widget.onTap();
+      },
       onTapCancel: () => _ctrl.reverse(),
       child: AnimatedBuilder(
         animation: _ctrl,

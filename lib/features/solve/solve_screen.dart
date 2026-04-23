@@ -21,8 +21,18 @@ class _Haptics {
 
 // ─── Enums ───────────────────────────────────────────────────────────────
 enum NodeCategory {
-  core, problem, cause, effect, solution, action,
-  note, reminder, focus, journal, resource, positive,
+  core,
+  problem,
+  cause,
+  effect,
+  solution,
+  action,
+  note,
+  reminder,
+  focus,
+  journal,
+  resource,
+  positive,
 }
 
 enum ConnType { causal, effect, solution, action, relation }
@@ -39,52 +49,88 @@ class _CatCfg {
 
 final Map<NodeCategory, _CatCfg> _cfg = {
   NodeCategory.core: const _CatCfg(
-    'Kern', 'Dein Mittelpunkt',
-    Color(0xFF0A84FF), Icons.person_rounded, 0,
+    'Kern',
+    'Dein Mittelpunkt',
+    Color(0xFF0A84FF),
+    Icons.person_rounded,
+    0,
   ),
   NodeCategory.problem: const _CatCfg(
-    'Problem', 'Herausforderung hinzufügen',
-    Color(0xFFFF453A), Icons.warning_amber_rounded, 1,
+    'Problem',
+    'Herausforderung hinzufügen',
+    Color(0xFFFF453A),
+    Icons.warning_amber_rounded,
+    1,
   ),
   NodeCategory.cause: const _CatCfg(
-    'Ursache', 'Woher kommt es?',
-    Color(0xFFBF5AF2), Icons.psychology_rounded, 1,
+    'Ursache',
+    'Woher kommt es?',
+    Color(0xFFBF5AF2),
+    Icons.psychology_rounded,
+    1,
   ),
   NodeCategory.effect: const _CatCfg(
-    'Auswirkung', 'Was bewirkt es?',
-    Color(0xFFFF6482), Icons.show_chart_rounded, 1,
+    'Auswirkung',
+    'Was bewirkt es?',
+    Color(0xFFFF6482),
+    Icons.show_chart_rounded,
+    1,
   ),
   NodeCategory.solution: const _CatCfg(
-    'Lösung', 'Lösungsansatz beschreiben',
-    Color(0xFF30D158), Icons.lightbulb_rounded, 2,
+    'Lösung',
+    'Lösungsansatz beschreiben',
+    Color(0xFF30D158),
+    Icons.lightbulb_rounded,
+    2,
   ),
   NodeCategory.action: const _CatCfg(
-    'Maßnahme', 'Konkreter nächster Schritt',
-    Color(0xFFFFD60A), Icons.rocket_launch_rounded, 2,
+    'Maßnahme',
+    'Konkreter nächster Schritt',
+    Color(0xFFFFD60A),
+    Icons.rocket_launch_rounded,
+    2,
   ),
   NodeCategory.note: const _CatCfg(
-    'Notiz', 'Gedanken festhalten',
-    Color(0xFF64D2FF), Icons.sticky_note_2_rounded, 2,
+    'Notiz',
+    'Gedanken festhalten',
+    Color(0xFF64D2FF),
+    Icons.sticky_note_2_rounded,
+    2,
   ),
   NodeCategory.reminder: const _CatCfg(
-    'Erinnerung', 'Datum & Uhrzeit wählen',
-    Color(0xFFFF9F0A), Icons.alarm_rounded, 2,
+    'Erinnerung',
+    'Datum & Uhrzeit wählen',
+    Color(0xFFFF9F0A),
+    Icons.alarm_rounded,
+    2,
   ),
   NodeCategory.focus: const _CatCfg(
-    'Fokus', 'Worauf konzentrierst du dich?',
-    Color(0xFFAC8E68), Icons.center_focus_strong_rounded, 1,
+    'Fokus',
+    'Worauf konzentrierst du dich?',
+    Color(0xFFAC8E68),
+    Icons.center_focus_strong_rounded,
+    1,
   ),
   NodeCategory.journal: const _CatCfg(
-    'Tagebuch', 'Tageseintrag schreiben',
-    Color(0xFF5E5CE6), Icons.auto_stories_rounded, 2,
+    'Tagebuch',
+    'Tageseintrag schreiben',
+    Color(0xFF5E5CE6),
+    Icons.auto_stories_rounded,
+    2,
   ),
   NodeCategory.resource: const _CatCfg(
-    'Ressource', 'Was steht dir zur Verfügung?',
-    Color(0xFF06C7BE), Icons.inventory_2_rounded, 2,
+    'Ressource',
+    'Was steht dir zur Verfügung?',
+    Color(0xFF06C7BE),
+    Icons.inventory_2_rounded,
+    2,
   ),
   NodeCategory.positive: const _CatCfg(
-    'Positives', 'Was funktioniert bereits?',
-    Color(0xFF30D158), Icons.thumb_up_alt_rounded, 2,
+    'Positives',
+    'Was funktioniert bereits?',
+    Color(0xFF30D158),
+    Icons.thumb_up_alt_rounded,
+    2,
   ),
 };
 
@@ -379,9 +425,9 @@ class _SolveScreenState extends State<SolveScreen>
   void _onSU(ScaleUpdateDetails d) {
     setState(() {
       _rotY += d.focalPointDelta.dx * 0.008;
-      _rotX = (_rotX + d.focalPointDelta.dy * 0.008).clamp(-0.8, 0.8);
+      _rotX = (_rotX - d.focalPointDelta.dy * 0.008).clamp(-0.8, 0.8);
       _vx = d.focalPointDelta.dx * 0.0015;
-      _vy = d.focalPointDelta.dy * 0.0015;
+      _vy = -d.focalPointDelta.dy * 0.0015;
       if (d.pointerCount >= 2) {
         _tZoom = (_bZoom * d.horizontalScale).clamp(0.4, 3.0);
       }
@@ -458,8 +504,8 @@ class _SolveScreenState extends State<SolveScreen>
   _Proj? _proj(ONode node, Offset ctr, double br) {
     final e = _entryC.value;
     final ld = (node.layer * 0.2).clamp(0.0, 0.6);
-    final le = Curves.easeOutBack
-        .transform(((e - ld) / (1.0 - ld)).clamp(0.0, 1.0));
+    final le =
+        Curves.easeOutBack.transform(((e - ld) / (1.0 - ld)).clamp(0.0, 1.0));
     final r = node.radius * le +
         math.sin(_pulseC.value * math.pi * 2 + node.angle) * 0.012;
 
@@ -677,8 +723,7 @@ class _SolveScreenState extends State<SolveScreen>
                                 c.sub,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color:
-                                      Colors.white.withValues(alpha: 0.35),
+                                  color: Colors.white.withValues(alpha: 0.35),
                                 ),
                               ),
                             ],
@@ -849,24 +894,48 @@ class _SolveScreenState extends State<SolveScreen>
                 ],
               ),
               const SizedBox(height: 16),
-              _optTile(ctx, 'Beschreiben', 'Beschreibung bearbeiten',
-                  Icons.edit_rounded, const Color(0xFF0A84FF),
+              _optTile(
+                  ctx,
+                  'Beschreiben',
+                  'Beschreibung bearbeiten',
+                  Icons.edit_rounded,
+                  const Color(0xFF0A84FF),
                   () => _editDesc(node)),
-              _optTile(ctx, 'KI fragen', 'nexiia um Hilfe bitten',
-                  Icons.auto_awesome_rounded, const Color(0xFFBF5AF2),
+              _optTile(
+                  ctx,
+                  'KI fragen',
+                  'nexiia um Hilfe bitten',
+                  Icons.auto_awesome_rounded,
+                  const Color(0xFFBF5AF2),
                   () => _askAI(node)),
               if (!isCore) ...[
-                _optTile(ctx, 'Verbinden', 'Mit anderem Knoten verknüpfen',
-                    Icons.link_rounded, const Color(0xFF64D2FF),
+                _optTile(
+                    ctx,
+                    'Verbinden',
+                    'Mit anderem Knoten verknüpfen',
+                    Icons.link_rounded,
+                    const Color(0xFF64D2FF),
                     () => _connectNode(node)),
-                _optTile(ctx, 'Relevanz', 'Wichtigkeit anpassen',
-                    Icons.tune_rounded, const Color(0xFFFFD60A),
+                _optTile(
+                    ctx,
+                    'Relevanz',
+                    'Wichtigkeit anpassen',
+                    Icons.tune_rounded,
+                    const Color(0xFFFFD60A),
                     () => _changeImp(node)),
-                _optTile(ctx, 'Erinnerung', 'Erinnerung setzen',
-                    Icons.alarm_add_rounded, const Color(0xFFFF9F0A),
+                _optTile(
+                    ctx,
+                    'Erinnerung',
+                    'Erinnerung setzen',
+                    Icons.alarm_add_rounded,
+                    const Color(0xFFFF9F0A),
                     () => _setReminder(node)),
-                _optTile(ctx, 'Entfernen', 'Löschen',
-                    Icons.delete_outline_rounded, const Color(0xFFFF453A),
+                _optTile(
+                    ctx,
+                    'Entfernen',
+                    'Löschen',
+                    Icons.delete_outline_rounded,
+                    const Color(0xFFFF453A),
                     () => _confirmDel(node)),
               ],
               const SizedBox(height: 8),
@@ -1008,8 +1077,7 @@ class _SolveScreenState extends State<SolveScreen>
                         node.color.withValues(alpha: 0.2),
                         node.color,
                         () {
-                          setState(
-                              () => node.description = ctrl.text.trim());
+                          setState(() => node.description = ctrl.text.trim());
                           Navigator.pop(ctx);
                         },
                       ),
@@ -1126,11 +1194,9 @@ class _SolveScreenState extends State<SolveScreen>
                           horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color:
-                            const Color(0xFFBF5AF2).withValues(alpha: 0.1),
+                        color: const Color(0xFFBF5AF2).withValues(alpha: 0.1),
                         border: Border.all(
-                          color: const Color(0xFFBF5AF2)
-                              .withValues(alpha: 0.2),
+                          color: const Color(0xFFBF5AF2).withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -1199,8 +1265,8 @@ class _SolveScreenState extends State<SolveScreen>
                           (c.from == node.id && c.to == o.id) ||
                           (c.from == o.id && c.to == node.id));
                       if (!exists) {
-                        setState(() => _conns.add(
-                            Conn(node.id, o.id, 0.6, ConnType.relation)));
+                        setState(() => _conns
+                            .add(Conn(node.id, o.id, 0.6, ConnType.relation)));
                       }
                       Navigator.pop(ctx);
                     },
@@ -1276,8 +1342,7 @@ class _SolveScreenState extends State<SolveScreen>
                   SliderTheme(
                     data: SliderThemeData(
                       activeTrackColor: node.color,
-                      inactiveTrackColor:
-                          Colors.white.withValues(alpha: 0.06),
+                      inactiveTrackColor: Colors.white.withValues(alpha: 0.06),
                       thumbColor: node.color,
                       overlayColor: node.color.withValues(alpha: 0.1),
                       trackHeight: 4,
@@ -1458,12 +1523,10 @@ class _SolveScreenState extends State<SolveScreen>
                         () {
                           setState(() {
                             node.journal = ctrl.text.trim();
-                            node.description =
-                                ctrl.text.trim().length > 40
-                                    ? '${ctrl.text.trim().substring(0, 40)}…'
-                                    : ctrl.text.trim();
-                            node.label =
-                                'Eintrag ${_fmtD(DateTime.now())}';
+                            node.description = ctrl.text.trim().length > 40
+                                ? '${ctrl.text.trim().substring(0, 40)}…'
+                                : ctrl.text.trim();
+                            node.label = 'Eintrag ${_fmtD(DateTime.now())}';
                           });
                           Navigator.pop(ctx);
                         },
@@ -1500,8 +1563,7 @@ class _SolveScreenState extends State<SolveScreen>
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color:
-                        const Color(0xFFFF453A).withValues(alpha: 0.15),
+                    color: const Color(0xFFFF453A).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(Icons.delete_outline_rounded,
@@ -1558,8 +1620,6 @@ class _SolveScreenState extends State<SolveScreen>
     );
   }
 
-// HIER ENDET TEIL 1 — TEIL 2 DIREKT DARUNTER EINFÜGEN (KEIN ENTER DAZWISCHEN)// ═══════════════════════════════════════════════════════════════════════════
-// TEIL 2 — ALLES AB HIER BIS DATEIENDE
 // ═══════════════════════════════════════════════════════════════════════════
 
   @override
@@ -1574,8 +1634,7 @@ class _SolveScreenState extends State<SolveScreen>
           onPointerSignal: (e) {
             if (e is PointerScrollEvent) {
               setState(() {
-                _tZoom =
-                    (_tZoom + e.scrollDelta.dy * -0.001).clamp(0.4, 3.0);
+                _tZoom = (_tZoom + e.scrollDelta.dy * -0.001).clamp(0.4, 3.0);
               });
             }
           },
@@ -1644,8 +1703,7 @@ class _SolveScreenState extends State<SolveScreen>
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
-                                color:
-                                    Colors.white.withValues(alpha: 0.95),
+                                color: Colors.white.withValues(alpha: 0.95),
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -1654,8 +1712,7 @@ class _SolveScreenState extends State<SolveScreen>
                               '${_nodes.length} Elemente · ${_conns.length} Verbindungen',
                               style: TextStyle(
                                 fontSize: 12,
-                                color:
-                                    Colors.white.withValues(alpha: 0.35),
+                                color: Colors.white.withValues(alpha: 0.35),
                               ),
                             ),
                           ],
@@ -1682,7 +1739,7 @@ class _SolveScreenState extends State<SolveScreen>
                 ),
                 Positioned(
                   right: 16,
-                  bottom: pad.bottom + 120,
+                  bottom: pad.bottom + 206,
                   child: Column(
                     children: [
                       _iconBtn(
@@ -1694,9 +1751,7 @@ class _SolveScreenState extends State<SolveScreen>
                       ),
                       const SizedBox(height: 8),
                       _iconBtn(
-                        _showConn
-                            ? Icons.share_rounded
-                            : Icons.share_outlined,
+                        _showConn ? Icons.share_rounded : Icons.share_outlined,
                         () => setState(() => _showConn = !_showConn),
                         active: _showConn,
                       ),
@@ -1727,7 +1782,7 @@ class _SolveScreenState extends State<SolveScreen>
                 ),
                 if (_selId != null) _buildDetail(),
                 Positioned(
-                  bottom: pad.bottom + 24,
+                  bottom: pad.bottom + 110,
                   left: 0,
                   right: 0,
                   child: Center(
@@ -1735,14 +1790,14 @@ class _SolveScreenState extends State<SolveScreen>
                       onTap: _showAddMenu,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 14),
+                            horizontal: 18, vertical: 11),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
-                          color: const Color(0xFF0A84FF)
-                              .withValues(alpha: 0.12),
+                          color:
+                              const Color(0xFF0A84FF).withValues(alpha: 0.12),
                           border: Border.all(
-                            color: const Color(0xFF0A84FF)
-                                .withValues(alpha: 0.25),
+                            color:
+                                const Color(0xFF0A84FF).withValues(alpha: 0.25),
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -1758,14 +1813,14 @@ class _SolveScreenState extends State<SolveScreen>
                           children: [
                             const Icon(
                               Icons.add_rounded,
-                              size: 20,
+                              size: 18,
                               color: Color(0xFF0A84FF),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Hinzufügen',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF0A84FF)
                                     .withValues(alpha: 0.9),
@@ -1778,7 +1833,7 @@ class _SolveScreenState extends State<SolveScreen>
                   ),
                 ),
                 Positioned(
-                  bottom: pad.bottom + 68,
+                  bottom: pad.bottom + 154,
                   left: 20,
                   right: 20,
                   child: Row(
@@ -1795,8 +1850,7 @@ class _SolveScreenState extends State<SolveScreen>
                       Container(
                         width: 1,
                         height: 10,
-                        margin:
-                            const EdgeInsets.symmetric(horizontal: 10),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
                         color: Colors.white.withValues(alpha: 0.08),
                       ),
                       Text(
@@ -1820,11 +1874,10 @@ class _SolveScreenState extends State<SolveScreen>
 
   Widget _buildDetail() {
     final node = _nodes.firstWhere((n) => n.id == _selId!);
-    final rc =
-        _conns.where((c) => c.from == node.id || c.to == node.id).length;
+    final rc = _conns.where((c) => c.from == node.id || c.to == node.id).length;
 
     return Positioned(
-      bottom: MediaQuery.of(context).padding.bottom + 110,
+      bottom: MediaQuery.of(context).padding.bottom + 196,
       left: 20,
       right: 75,
       child: TweenAnimationBuilder<double>(
@@ -1844,8 +1897,7 @@ class _SolveScreenState extends State<SolveScreen>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
                 color: Colors.white.withValues(alpha: 0.06),
-                border:
-                    Border.all(color: node.color.withValues(alpha: 0.2)),
+                border: Border.all(color: node.color.withValues(alpha: 0.2)),
                 boxShadow: [
                   BoxShadow(
                     color: node.color.withValues(alpha: 0.08),
@@ -1867,8 +1919,7 @@ class _SolveScreenState extends State<SolveScreen>
                           color: node.color.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(11),
                         ),
-                        child:
-                            Icon(node.icon, size: 18, color: node.color),
+                        child: Icon(node.icon, size: 18, color: node.color),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1888,8 +1939,7 @@ class _SolveScreenState extends State<SolveScreen>
                                 node.description,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white
-                                      .withValues(alpha: 0.45),
+                                  color: Colors.white.withValues(alpha: 0.45),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -1915,8 +1965,7 @@ class _SolveScreenState extends State<SolveScreen>
                       _chip('$rc Verb.', Colors.white),
                       const SizedBox(width: 6),
                       _chip(
-                          '${(node.importance * 100).round()}%',
-                          Colors.white),
+                          '${(node.importance * 100).round()}%', Colors.white),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -1924,8 +1973,7 @@ class _SolveScreenState extends State<SolveScreen>
                     borderRadius: BorderRadius.circular(3),
                     child: LinearProgressIndicator(
                       value: node.importance,
-                      backgroundColor:
-                          Colors.white.withValues(alpha: 0.06),
+                      backgroundColor: Colors.white.withValues(alpha: 0.06),
                       valueColor: AlwaysStoppedAnimation(
                         node.color.withValues(alpha: 0.6),
                       ),
@@ -1976,8 +2024,7 @@ class _SolveScreenState extends State<SolveScreen>
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
-          padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: on
@@ -1996,9 +2043,7 @@ class _SolveScreenState extends State<SolveScreen>
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: on
-                      ? c
-                      : Colors.white.withValues(alpha: 0.2),
+                  color: on ? c : Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -2008,9 +2053,7 @@ class _SolveScreenState extends State<SolveScreen>
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: on
-                      ? c
-                      : Colors.white.withValues(alpha: 0.35),
+                  color: on ? c : Colors.white.withValues(alpha: 0.35),
                 ),
               ),
               const SizedBox(width: 6),
@@ -2116,11 +2159,9 @@ class _OPainter extends CustomPainter {
     required this.partT,
   });
 
-  Color _c(Color base, double a) =>
-      base.withValues(alpha: a.clamp(0.0, 1.0));
+  Color _c(Color base, double a) => base.withValues(alpha: a.clamp(0.0, 1.0));
 
-  Color _w(double a) =>
-      Colors.white.withValues(alpha: a.clamp(0.0, 1.0));
+  Color _w(double a) => Colors.white.withValues(alpha: a.clamp(0.0, 1.0));
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -2155,8 +2196,7 @@ class _OPainter extends CustomPainter {
     final paint = Paint();
     for (final p in parts) {
       final t = (partT + p.ph) % 1.0;
-      final x =
-          (p.x + math.sin(t * math.pi * 2 + p.ph) * 0.03) * size.width;
+      final x = (p.x + math.sin(t * math.pi * 2 + p.ph) * 0.03) * size.width;
       final y = (p.y + t * p.spd * 0.5) % 1.0 * size.height;
       final alpha = p.op * (0.5 + 0.5 * math.sin(t * math.pi * 2));
       paint.color = _w(alpha);
@@ -2210,9 +2250,7 @@ class _OPainter extends CustomPainter {
         ConnType.relation => Colors.white,
       };
 
-      final alpha = hl
-          ? 0.45 * dAlpha
-          : 0.08 * dAlpha * c.strength;
+      final alpha = hl ? 0.45 * dAlpha : 0.08 * dAlpha * c.strength;
 
       final lp = Paint()
         ..style = PaintingStyle.stroke
@@ -2221,8 +2259,7 @@ class _OPainter extends CustomPainter {
 
       final p1 = from.p.pos;
       final p2 = to.p.pos;
-      final mid =
-          Offset((p1.dx + p2.dx) / 2, (p1.dy + p2.dy) / 2 - 15);
+      final mid = Offset((p1.dx + p2.dx) / 2, (p1.dy + p2.dy) / 2 - 15);
 
       final path = Path()
         ..moveTo(p1.dx, p1.dy)
@@ -2231,11 +2268,9 @@ class _OPainter extends CustomPainter {
 
       if (hl) {
         final dp = Paint()..color = _c(cc, 0.7 * dAlpha);
-        final d1 =
-            _quadPt(p1, mid, p2, (flow + c.strength * 0.5) % 1.0);
+        final d1 = _quadPt(p1, mid, p2, (flow + c.strength * 0.5) % 1.0);
         canvas.drawCircle(d1, 2.5, dp);
-        final d2 = _quadPt(
-            p1, mid, p2, (flow + 0.5 + c.strength * 0.5) % 1.0);
+        final d2 = _quadPt(p1, mid, p2, (flow + 0.5 + c.strength * 0.5) % 1.0);
         canvas.drawCircle(d2, 2, dp);
       }
     }
@@ -2338,8 +2373,7 @@ class _OPainter extends CustomPainter {
         ),
         const Radius.circular(6),
       );
-      final tbp = Paint()
-        ..color = _c(const Color(0xFF0A0A0F), 0.7 * fa);
+      final tbp = Paint()..color = _c(const Color(0xFF0A0A0F), 0.7 * fa);
       canvas.drawRRect(tbr, tbp);
 
       tp.paint(
@@ -2356,8 +2390,8 @@ class _OPainter extends CustomPainter {
     final ld = (node.layer * 0.2).clamp(0.0, 0.6);
     final le = Curves.easeOutBack
         .transform(((entry - ld) / (1.0 - ld)).clamp(0.0, 1.0));
-    final r = node.radius * le +
-        math.sin(pulse * math.pi * 2 + node.angle) * 0.012;
+    final r =
+        node.radius * le + math.sin(pulse * math.pi * 2 + node.angle) * 0.012;
 
     double x = r * math.cos(node.angle);
     double y = node.elevation * 0.5 * le;

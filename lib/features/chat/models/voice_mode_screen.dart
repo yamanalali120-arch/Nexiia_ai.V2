@@ -103,7 +103,8 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
               children: [
                 // ── Top Bar ──
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Row(
                     children: [
                       GestureDetector(
@@ -175,7 +176,8 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
                 GestureDetector(
                   onTap: _toggleListening,
                   child: AnimatedBuilder(
-                    animation: Listenable.merge([_orbCtrl, _breathCtrl, _ringCtrl]),
+                    animation:
+                        Listenable.merge([_orbCtrl, _breathCtrl, _ringCtrl]),
                     builder: (_, __) {
                       final breath = 0.94 + _breathCtrl.value * 0.06;
                       final orbRotation = _orbCtrl.value * math.pi * 2;
@@ -192,7 +194,9 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
                             if (isActive)
                               ...List.generate(3, (i) {
                                 final delay = i * 0.33;
-                                final p = ((ringVal - delay) % 1.0).clamp(0.0, 1.0).toDouble();
+                                final p = ((ringVal - delay) % 1.0)
+                                    .clamp(0.0, 1.0)
+                                    .toDouble();
                                 final size = 180.0 + p * 70;
                                 return Container(
                                   width: size,
@@ -238,7 +242,8 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
                                 angle: orbRotation * 0.1,
                                 child: ClipOval(
                                   child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 40, sigmaY: 40),
                                     child: Container(
                                       width: 160,
                                       height: 160,
@@ -247,19 +252,25 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
                                         gradient: SweepGradient(
                                           startAngle: orbRotation,
                                           colors: [
-                                            AppColors.electricBlue.withOpacity(isActive ? 0.35 : 0.18),
-                                            const Color(0xFF8B5CF6).withOpacity(isActive ? 0.25 : 0.10),
-                                            const Color(0xFF06B6D4).withOpacity(isActive ? 0.30 : 0.12),
-                                            AppColors.electricBlue.withOpacity(isActive ? 0.35 : 0.18),
+                                            AppColors.electricBlue.withOpacity(
+                                                isActive ? 0.35 : 0.18),
+                                            const Color(0xFF8B5CF6).withOpacity(
+                                                isActive ? 0.25 : 0.10),
+                                            const Color(0xFF06B6D4).withOpacity(
+                                                isActive ? 0.30 : 0.12),
+                                            AppColors.electricBlue.withOpacity(
+                                                isActive ? 0.35 : 0.18),
                                           ],
                                         ),
                                         border: Border.all(
-                                          color: Colors.white.withOpacity(isActive ? 0.20 : 0.10),
+                                          color: Colors.white.withOpacity(
+                                              isActive ? 0.20 : 0.10),
                                           width: 0.8,
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.15),
+                                            color:
+                                                Colors.black.withOpacity(0.15),
                                             blurRadius: 30,
                                             offset: const Offset(0, 8),
                                           ),
@@ -281,7 +292,8 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      Colors.white.withOpacity(isActive ? 0.25 : 0.12),
+                                      Colors.white
+                                          .withOpacity(isActive ? 0.25 : 0.12),
                                       Colors.white.withOpacity(0.02),
                                     ],
                                   ),
@@ -297,7 +309,8 @@ class _NexiiaVoiceModeScreenState extends State<NexiiaVoiceModeScreen>
                                           ? Icons.volume_up_rounded
                                           : Icons.mic_none_rounded,
                                   size: 24,
-                                  color: Colors.white.withOpacity(isActive ? 0.90 : 0.50),
+                                  color: Colors.white
+                                      .withOpacity(isActive ? 0.90 : 0.50),
                                 ),
                               ),
                             ),
@@ -457,37 +470,44 @@ class _VoiceBgPainter extends CustomPainter {
     final r = Rect.fromLTWH(0, 0, size.width, size.height);
 
     // Deep dark base
-    canvas.drawRect(r, Paint()
-      ..shader = const RadialGradient(
-        center: Alignment(0, -0.2),
-        radius: 1.2,
-        colors: [Color(0xFF0A0E1E), Color(0xFF060818), Color(0xFF040610)],
-      ).createShader(r));
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = const RadialGradient(
+            center: Alignment(0, -0.2),
+            radius: 1.2,
+            colors: [Color(0xFF0A0E1E), Color(0xFF060818), Color(0xFF040610)],
+          ).createShader(r));
 
     // Central glow
     final glowOpacity = isActive ? 0.18 + t * 0.08 : 0.08 + t * 0.04;
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: Alignment(0, 0.1 + math.sin(t * math.pi) * 0.05),
-        radius: 0.6,
-        colors: [
-          AppColors.electricBlue.withOpacity(glowOpacity),
-          Colors.transparent,
-        ],
-      ).createShader(r));
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: Alignment(0, 0.1 + math.sin(t * math.pi) * 0.05),
+            radius: 0.6,
+            colors: [
+              AppColors.electricBlue.withOpacity(glowOpacity),
+              Colors.transparent,
+            ],
+          ).createShader(r));
 
     // Violet glow
-    canvas.drawRect(r, Paint()
-      ..shader = RadialGradient(
-        center: Alignment(0.3, -0.2),
-        radius: 0.5,
-        colors: [
-          const Color(0xFF8B5CF6).withOpacity(isActive ? 0.08 : 0.04),
-          Colors.transparent,
-        ],
-      ).createShader(r));
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: Alignment(0.3, -0.2),
+            radius: 0.5,
+            colors: [
+              const Color(0xFF8B5CF6).withOpacity(isActive ? 0.08 : 0.04),
+              Colors.transparent,
+            ],
+          ).createShader(r));
   }
 
   @override
-  bool shouldRepaint(_VoiceBgPainter old) => old.t != t || old.isActive != isActive;
+  bool shouldRepaint(_VoiceBgPainter old) =>
+      old.t != t || old.isActive != isActive;
 }

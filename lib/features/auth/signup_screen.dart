@@ -12,6 +12,7 @@ import '../../shared/widgets/premium_button.dart';
 import 'widgets/auth_input_field.dart';
 import 'widgets/password_strength_bar.dart';
 import 'widgets/social_login_buttons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // ← NEU!
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -111,8 +112,18 @@ class _SignupScreenState extends State<SignupScreen>
     } catch (e) {
       if (!mounted) return;
       Haptics.error();
+
+      // ⬇️ DEBUG: Zeige echten Fehler in Console
+      print('🔴🔴🔴 LOGIN ERROR: $e');
+      print('🔴🔴🔴 ERROR TYPE: ${e.runtimeType}');
+      if (e is AuthException) {
+        print('🔴🔴🔴 MESSAGE: ${e.message}');
+        print('🔴🔴🔴 STATUS CODE: ${e.statusCode}');
+      }
+
       setState(() {
-        _errorMessage = AuthErrorMapper.mapAny(e);
+        // Temporär: echten Fehler anzeigen
+        _errorMessage = 'DEBUG: $e';
         _isLoading = false;
       });
     }
@@ -253,11 +264,10 @@ class _SignupScreenState extends State<SignupScreen>
                               keyboardType: TextInputType.visiblePassword,
                               textInputAction: TextInputAction.done,
                               focusNode: _confirmFocus,
-                              validator: (value) =>
-                                  Validators.passwordConfirm(
-                                    value,
-                                    _passwordController.text,
-                                  ),
+                              validator: (value) => Validators.passwordConfirm(
+                                value,
+                                _passwordController.text,
+                              ),
                               enabled: !_isLoading,
                             ),
                           ],
@@ -271,8 +281,8 @@ class _SignupScreenState extends State<SignupScreen>
                             ? null
                             : () {
                                 Haptics.selection();
-                                setState(() =>
-                                    _termsAccepted = !_termsAccepted);
+                                setState(
+                                    () => _termsAccepted = !_termsAccepted);
                               },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,8 +304,7 @@ class _SignupScreenState extends State<SignupScreen>
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 2),
+                                padding: const EdgeInsets.only(top: 2),
                                 child: Text.rich(
                                   TextSpan(
                                     text: AppStrings.signupTermsPrefix,

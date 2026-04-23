@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // NEXIIA — Transition Screen (Onboarding Step 5)
-// Kinematische Brücke zwischen Onboarding und Home.
+// Kinematische Brücke zwischen Onboarding und Home — Schneller.
 // ═══════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -24,7 +24,8 @@ class _TransitionScreenState extends State<TransitionScreen>
   late final Animation<double> _expandAnimation;
   late final Animation<double> _fadeOutAnimation;
 
-  static const _totalDuration = Duration(milliseconds: 1500);
+  // Schneller als vorher
+  static const _totalDuration = Duration(milliseconds: 1000);
 
   @override
   void initState() {

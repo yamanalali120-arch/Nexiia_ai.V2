@@ -821,7 +821,7 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
 
           // FAB
           Positioned(
-            bottom: botPad + 26,
+            bottom: botPad + 110,
             left: 20,
             child: ScaleTransition(
               scale:
@@ -839,7 +839,7 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
           AnimatedPositioned(
             duration: const Duration(milliseconds: 420),
             curve: Curves.easeOutCubic,
-            bottom: _showAiCard ? botPad + 110.0 : -220.0,
+            bottom: _showAiCard ? botPad + 194.0 : -220.0,
             left: 20,
             right: 88,
             child: _showAiCard
@@ -876,7 +876,7 @@ class _NexiiaHorizonCalendarState extends State<NexiiaHorizonCalendar>
 
           // Voice Orb
           Positioned(
-            bottom: botPad + 26,
+            bottom: botPad + 110,
             right: 20,
             child: _VoiceOrb(
               isActive: _voiceActive,

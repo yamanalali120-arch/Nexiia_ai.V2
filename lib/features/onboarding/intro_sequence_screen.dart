@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // NEXIIA — Intro Sequence Screen (Onboarding Step 4)
+// Schnellere Animationen + Atmosphäre-Farben
 // ═══════════════════════════════════════════════════════════════════
 
 import 'dart:ui';
@@ -35,7 +36,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
   late final AnimationController _buttonController;
   late final AnimationController _glowController;
 
-  // Atmosphäre — synchron
   late final AtmosphereModel _atmosphere;
 
   static const _curve = Curves.easeOutCubic;
@@ -66,15 +66,15 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
 
     _contentController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 300),
     );
     _skipController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
     );
     _buttonController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 300),
     );
     _glowController = AnimationController(
       vsync: this,
@@ -85,13 +85,13 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
   }
 
   Future<void> _startEntrance() async {
-    await Future.delayed(const Duration(milliseconds: 150));
-    if (!mounted) return;
-    _skipController.forward();
     await Future.delayed(const Duration(milliseconds: 100));
     if (!mounted) return;
+    _skipController.forward();
+    await Future.delayed(const Duration(milliseconds: 80));
+    if (!mounted) return;
     _contentController.forward();
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 100));
     if (!mounted) return;
     _buttonController.forward();
   }
@@ -129,11 +129,9 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
     AppRouter.onboardingIntroDone(context);
   }
 
-  // ── Farb-Getter ──
   Color get _primary => _atmosphere.colors.primary;
   Color get _secondary => _atmosphere.colors.secondary;
 
-  // Hintergrund-Gradient dynamisch basierend auf Atmosphäre
   LinearGradient get _backgroundGradient {
     return LinearGradient(
       begin: Alignment.topCenter,
@@ -152,17 +150,15 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
       backgroundColor: AppColors.background,
       body: AnimatedGradientBg(
         gradient: _backgroundGradient,
-        orbColor: _primary, // ← Atmosphäre-Farbe für die Orbs!
+        orbColor: _primary,
         child: Stack(
           children: [
-            // Extra Atmosphäre-Glow Layer für mehr Tiefe
             AnimatedBuilder(
               animation: _glowController,
               builder: (context, _) {
                 final t = _glowController.value * 2 * math.pi;
                 return Stack(
                   children: [
-                    // Oberer Glow — Atmosphäre-Primärfarbe
                     Positioned(
                       top: -80,
                       left: 0,
@@ -184,7 +180,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
                         ),
                       ),
                     ),
-                    // Unterer Glow — Sekundärfarbe
                     Positioned(
                       bottom: -40,
                       left: 0,
@@ -229,8 +224,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
     );
   }
 
-  // ─── Skip Button ───────────────────────────────────────────
-
   Widget _buildSkipButton() {
     final curved = CurvedAnimation(parent: _skipController, curve: _curve);
 
@@ -261,8 +254,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
     );
   }
 
-  // ─── Page View ──────────────────────────────────────────────
-
   Widget _buildPageView() {
     final curved = CurvedAnimation(parent: _contentController, curve: _curve);
 
@@ -278,8 +269,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
     );
   }
 
-  // ─── Single Page ────────────────────────────────────────────
-
   Widget _buildPage(_IntroPageData page) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -287,22 +276,14 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(flex: 2),
-
-          // Icon Circle mit Atmosphäre-Farbe
           _buildIconCircle(page.icon),
-
           SizedBox(height: AppSpacing.xxl),
-
-          // Headline
           Text(
             page.headline,
             style: AppTypography.headlineMedium,
             textAlign: TextAlign.center,
           ),
-
           SizedBox(height: AppSpacing.md),
-
-          // Body
           Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Text(
@@ -314,7 +295,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
               textAlign: TextAlign.center,
             ),
           ),
-
           const Spacer(flex: 3),
         ],
       ),
@@ -360,7 +340,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
             ),
             child: Stack(
               children: [
-                // 3D Inner Highlight
                 Positioned(
                   top: 2,
                   left: 10,
@@ -395,8 +374,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
     );
   }
 
-  // ─── Dot Indicators ────────────────────────────────────────
-
   Widget _buildDotIndicators() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -427,8 +404,6 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
     );
   }
 
-  // ─── Continue Button ───────────────────────────────────────
-
   Widget _buildContinueButton() {
     final curved = CurvedAnimation(parent: _buttonController, curve: _curve);
     final isLastPage = _currentPage == _pages.length - 1;
@@ -445,170 +420,86 @@ class _IntroSequenceScreenState extends State<IntroSequenceScreen>
         )),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-          child: _IntroButton(
-            label: isLastPage
-                ? AppStrings.intro3Button
-                : AppStrings.generalContinue,
-            color: _primary,
-            onPressed: _onNext,
+          child: GestureDetector(
+            onTap: _onNext,
+            child: Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    _primary.withValues(alpha: 0.85),
+                    _primary.withValues(alpha: 0.65),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: _primary.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    spreadRadius: -2,
+                    offset: const Offset(0, 6),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  width: 0.5,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 24,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.12),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      isLastPage
+                          ? AppStrings.intro3Button
+                          : 'Weiter',
+                      style: const TextStyle(
+                        fontFamily: 'Satoshi',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// INTRO BUTTON
-// ═══════════════════════════════════════════════════════════════════
-
-class _IntroButton extends StatefulWidget {
-  final String label;
-  final Color color;
-  final VoidCallback onPressed;
-
-  const _IntroButton({
-    required this.label,
-    required this.color,
-    required this.onPressed,
-  });
-
-  @override
-  State<_IntroButton> createState() => _IntroButtonState();
-}
-
-class _IntroButtonState extends State<_IntroButton>
-    with SingleTickerProviderStateMixin {
-  bool _isPressed = false;
-  late final AnimationController _glowController;
-  late final Animation<double> _glowAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
-    _glowAnim = Tween<double>(begin: 0.2, end: 0.5).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _glowController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _glowController,
-      builder: (context, _) {
-        return GestureDetector(
-          onTapDown: (_) => setState(() => _isPressed = true),
-          onTapUp: (_) => setState(() => _isPressed = false),
-          onTapCancel: () => setState(() => _isPressed = false),
-          onTap: widget.onPressed,
-          child: AnimatedScale(
-            scale: _isPressed ? 0.975 : 1.0,
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.easeOutCubic,
-            child: Container(
-              height: AppSpacing.buttonHeight,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.color
-                        .withValues(alpha: _glowAnim.value * 0.3),
-                    blurRadius: 20,
-                    spreadRadius: 0,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusLg),
-                      color: Colors.white.withValues(
-                        alpha: _isPressed ? 0.10 : 0.06,
-                      ),
-                      border: Border.all(
-                        color: widget.color
-                            .withValues(alpha: _glowAnim.value * 0.4),
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        // 3D Top Highlight
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: AppSpacing.buttonHeight * 0.4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft:
-                                    Radius.circular(AppSpacing.radiusLg),
-                                topRight:
-                                    Radius.circular(AppSpacing.radiusLg),
-                              ),
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.05),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 200),
-                            style: TextStyle(
-                              fontFamily: 'Satoshi',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.3,
-                              color: widget.color,
-                              height: 1.0,
-                            ),
-                            child: Text(widget.label),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// PAGE DATA MODEL
-// ═══════════════════════════════════════════════════════════════════
 
 class _IntroPageData {
   final String headline;

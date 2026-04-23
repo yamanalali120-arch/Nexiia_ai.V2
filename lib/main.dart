@@ -1,19 +1,26 @@
-// ═══════════════════════════════════════════════════════════════════
+//
 // FILE:    lib/main.dart
 // PURPOSE: App-Einstiegspunkt. Initialisiert alle Services und
 //          startet die NexiiaApp.
-// ═══════════════════════════════════════════════════════════════════
+//
+// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/services/user_preferences.dart';
+import 'core/services/tracking_service.dart';
 import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // .env Datei laden (für API Keys)
+  await dotenv.load(fileName: ".env");
 
   AppTheme.setSystemUI();
 
@@ -30,14 +37,34 @@ Future<void> main() async {
 
   await UserPreferences.init();
 
-  runApp(const NexiiaApp());
+  // ✅ NEU: Session-Tracking starten
+  final tracking = TrackingService();
+  if (Supabase.instance.client.auth.currentUser != null) {
+    await tracking.startSession(
+      os: _getOS(),
+      deviceType: 'mobile',
+    );
+    await tracking.updateLastActive();
+    print('✅ Tracking Session gestartet');
+  }
+
+  // ProviderScope für Riverpod
+  runApp(
+    const ProviderScope(
+      child: NexiiaApp(),
+    ), // ProviderScope
+  );
 }
-// Teste den Zugriff auf "Project X"
-void testSupabase() async {
+
+// Helper: OS erkennen
+String _getOS() {
   try {
-    final response = await Supabase.instance.client.from('Project X').select('*');
-    print('Daten erfolgreich geladen: $response');
+    if (identical(0, 0.0)) return 'web';
+    // Für bessere Erkennung: import 'dart:io';
+    // return Platform.isAndroid ? 'Android' : Platform.isIOS ? 'iOS' : 'unknown';
+    return 'mobile';
   } catch (e) {
-    print('Fehler beim Laden: $e');
+    return 'unknown';
   }
 }
+ 
