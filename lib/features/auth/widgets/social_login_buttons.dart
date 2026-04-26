@@ -133,8 +133,12 @@ class _SocialButtonState extends State<_SocialButton> {
         curve: Curves.easeOutCubic,
         width: double.infinity,
         height: AppSpacing.buttonHeight,
-        transform: Matrix4.identity()
-..scale(_isPressed ? 0.98 : 1.0, _isPressed ? 0.98 : 1.0),        transformAlignment: Alignment.center,
+        transform: Matrix4.diagonal3Values(
+          _isPressed ? 0.98 : 1.0,
+          _isPressed ? 0.98 : 1.0,
+          1.0,
+        ),
+        transformAlignment: Alignment.center,
         decoration: BoxDecoration(
           color: _isPressed ? AppColors.white08 : AppColors.white05,
           borderRadius: AppSpacing.borderRadiusSm,
