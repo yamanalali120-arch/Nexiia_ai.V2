@@ -24,7 +24,8 @@ class AppStrings {
   // ──────────────────────────────────────────
 
   static const String appName = 'Nexiia';
-  static const String appTagline = 'Deine persönliche Assistenz';
+  static const String appTagline =
+      'Dein KI-Assistent fuer Fokus, Planung & mentale Klarheit';
 
   // ──────────────────────────────────────────
   // SPLASH
@@ -145,7 +146,8 @@ class AppStrings {
   // ──────────────────────────────────────────
 
   static const String greetingLine1 = 'Hallo, ich bin Nexiia.';
-  static const String greetingLine2 = 'Deine persönliche Assistenz.';
+  static const String greetingLine2 =
+      'Dein KI-Assistent fuer Fokus, Planung & mentale Klarheit.';
   static const String greetingLine3 =
       'Ich helfe dir, Klarheit, Fokus und Struktur '
       'in deinen Alltag zu bringen.';
@@ -250,8 +252,8 @@ class AppStrings {
 
   static const String navHome = 'Home';
   static const String navChat = 'Chat';
-  static const String navSolve = 'Lösen';
-  static const String navCalendar = 'Kalender';
+  static const String navSolve = 'Problem';
+  static const String navCalendar = 'Planer';
   static const String navFocus = 'Fokus';
 
   // ──────────────────────────────────────────

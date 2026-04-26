@@ -16,18 +16,26 @@ import '../../navigation/app_router.dart';
 // ═══════════════════════════════════════════════════════════
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int initialTabIndex;
+  final String? initialChatPrompt;
+
+  const HomeScreen({
+    super.key,
+    this.initialTabIndex = 0,
+    this.initialChatPrompt,
+  });
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // ── State ──
-  int _currentTabIndex = 0;
+  late int _currentTabIndex;
   bool _isChatThreadOpen = false;
   String _userName = '';
   bool _voiceActive = false;
   bool _sheetOpen = false;
+  String? _pendingChatPrompt;
   late AtmosphereModel _atmo;
   late Color _pri;
   late Color _sec;
@@ -57,13 +65,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _currentTabIndex = widget.initialTabIndex;
+    _pendingChatPrompt = widget.initialChatPrompt;
     _userName = UserPreferences.getUserName();
     _atmo = UserPreferences.getAtmosphere();
     _pri = _atmo.colors.primary;
     _sec = _atmo.colors.secondary;
     _glo = _atmo.colors.glow;
 
-    _pageCtrl = PageController();
+    _pageCtrl = PageController(initialPage: _currentTabIndex);
     // ✅ DIESE ZEILE HINZUFÜGEN:
     _pageCtrl.addListener(() {
       if (_pageCtrl.hasClients && _pageCtrl.page != null) {
@@ -165,6 +175,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _pageCtrl.animateToPage(
       index,
       duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _openChatWithPrompt(String prompt) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _pendingChatPrompt = prompt;
+      _currentTabIndex = 1;
+    });
+    _pageCtrl.animateToPage(
+      1,
+      duration: const Duration(milliseconds: 420),
       curve: Curves.easeOutCubic,
     );
   }
@@ -306,21 +329,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildProfileSheet(BuildContext ctx) {
-    final double bp = MediaQuery.of(ctx).padding.bottom;
+    final double safeBottom = MediaQuery.of(ctx).viewPadding.bottom;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      margin: EdgeInsets.fromLTRB(12, 0, 12, 12 + safeBottom),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-          child: _buildProfileContent(ctx, bp),
+          child: _buildProfileContent(ctx),
         ),
       ),
     );
   }
 
-  Widget _buildProfileContent(BuildContext ctx, double bp) {
+  Widget _buildProfileContent(BuildContext ctx) {
     return AnimatedBuilder(
       animation: Listenable.merge([_refractionCtrl, _breathCtrl]),
       builder: (BuildContext bCtx, Widget? _) {
@@ -343,11 +366,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   : const Color(0xCC0C0C14),
               borderRadius: BorderRadius.circular(32),
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   Container(
                     width: 40,
                     height: 4,
@@ -402,11 +427,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   _sheetRow(
                     Icons.palette_outlined,
-                    'Atmosphäre wählen',
+                    'Design anpassen',
                     false,
                     () {
                       Navigator.pop(ctx);
-                      AppRouter.pushFade(context, const AtmosphereScreen());
+                      AppRouter.pushFadeSlide(
+                        context,
+                        const AtmosphereScreen(isFromSettings: true),
+                      );
                     },
                   ),
                   _sheetRow(
@@ -457,8 +485,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       );
                     },
                   ),
-                  SizedBox(height: bp + 8),
-                ],
+                  SizedBox(height: MediaQuery.of(ctx).viewPadding.bottom + 8),
+                  ],
+                ),
               ),
             ),
           ),
@@ -645,6 +674,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 _buildHomeTab(),
                 // ── HIER WIRD DER CALLBACK EMPFANGEN ──
                 NexiiaChatScreen(
+                  initialPrompt: _pendingChatPrompt,
+                  onInitialPromptConsumed: () {
+                    if (!mounted) return;
+                    setState(() => _pendingChatPrompt = null);
+                  },
                   onThreadToggled: (isOpen) {
                     if (mounted) {
                       setState(() => _isChatThreadOpen = isOpen);
@@ -703,15 +737,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String _getDynamicSubtitle() {
     final h = DateTime.now().hour;
     final subs = <String>[
-      'Was steht heute an?',
-      'Bereit für den Tag?',
-      'Was beschäftigt dich?',
-      'Wie kann ich helfen?',
-      'Worauf liegt dein Fokus?',
-      'Lass uns loslegen',
-      'Was brauchst du gerade?',
-      'Neuer Tag, neue Energie',
-      'Was möchtest du erreichen?',
+      'Was möchtest du gerade schaffen?',
+      'Womit starten wir am besten?',
+      'Plan, Klarheit oder nächster Schritt?',
+      'Sag mir kurz, worum es geht.',
+      'Was brauchst du gerade am meisten?',
+      'Lass uns Struktur reinbringen.',
     ];
     final seed = h * 7 + _userName.hashCode;
     return subs[seed.abs() % subs.length];
@@ -1049,7 +1080,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               // ✅ Lösen = andere Farbe (cyan/teal statt secondary)
               _quickAction(
                   Icons.auto_awesome_rounded,
-                  'Lösen',
+                  'Problem',
                   _isCrystal
                       ? const Color(0xFFC4D0E0)
                       : const Color(0xFF06B6D4),
@@ -1058,7 +1089,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               // Kalender = secondary
               _quickAction(
                   Icons.event_note_rounded,
-                  'Kalender',
+                  'Planer',
                   _isCrystal ? const Color(0xFFB0C4DE) : _sec,
                   () => _onTabTap(3)),
               const SizedBox(width: 10),
@@ -1226,7 +1257,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 18),
           const Text(
-            'Starte einen Chat um deinen Tag zu planen und Aufgaben zu organisieren.',
+            'Bereit für deinen ersten klaren Plan?',
+            style: TextStyle(
+              fontFamily: 'Satoshi',
+              color: AppColors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              height: 1.25,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Sag Nexiia kurz, was heute ansteht – daraus entsteht dein Tagesplan.',
             style: TextStyle(
               fontFamily: 'Satoshi',
               color: AppColors.white40,
@@ -1235,9 +1278,98 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               letterSpacing: 0.1,
             ),
           ),
-          const SizedBox(height: 20),
-          _buildCTAButton(),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: _primaryCta(
+                  label: 'Tag planen',
+                  onTap: () => _openChatWithPrompt(
+                    'Hilf mir, meinen Tag zu planen.',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _secondaryCta(
+                  label: 'Problem lösen',
+                  onTap: () => _onTabTap(2),
+                ),
+              ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _primaryCta({required String label, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              _pri.withValues(alpha: 0.55),
+              _sec.withValues(alpha: 0.35),
+            ],
+          ),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.10),
+            width: 0.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _pri.withValues(alpha: 0.22),
+              blurRadius: 22,
+              offset: const Offset(0, 10),
+              spreadRadius: -10,
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Satoshi',
+            color: AppColors.white95,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _secondaryCta({required String label, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white.withValues(alpha: 0.06),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.10),
+            width: 0.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Satoshi',
+            color: AppColors.white80,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
+          ),
+        ),
       ),
     );
   }
@@ -2172,7 +2304,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     children: [
                       _navItem(0, Icons.house_rounded, 'Home'),
                       _navItem(1, Icons.bolt_rounded, 'Chat'),
-                      _navItem(2, Icons.auto_awesome_rounded, 'Lösen'),
+                      _navItem(2, Icons.auto_awesome_rounded, 'Problem'),
                       _navItem(3, Icons.event_note_rounded, 'Planer'),
                       _navItem(4, Icons.hexagon_rounded, 'Fokus'),
                     ],

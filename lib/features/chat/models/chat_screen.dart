@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/user_preferences.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../shared/models/atmosphere_model.dart';
 import '../../ai/services/ai_service.dart';
 import 'chat_models.dart';
@@ -17,18 +18,17 @@ import 'voice_mode_screen.dart';
 
 class _GreetingData {
   static List<String> getSubtitles(String name) => [
-        'Was steht heute an?',
-        'Bereit für den Tag?',
-        'Was beschäftigt dich?',
-        'Wie kann ich helfen?',
-        'Was hast du vor?',
-        'Lass uns loslegen',
-        'Worauf liegt dein Fokus?',
+        'Was moechtest du gerade schaffen?',
+        'Womit starten wir am besten?',
+        'Plan, Klarheit oder naechster Schritt?',
+        'Sag mir kurz, worum es geht.',
+        'Was brauchst du gerade am meisten?',
+        'Lass uns Struktur reinbringen.',
+        'Ich bin da. Was ist das Ziel?',
         'Was brauchst du gerade?',
-        'Erzähl mir davon',
-        'Neuer Tag, neue Energie',
-        'Was möchtest du erreichen?',
-        'Ich bin für dich da',
+        'Sag mir kurz, worum es geht.',
+        'Was moechtest du erreichen?',
+        'Ich bin fuer dich da',
       ];
 
   static String getTimePrefix() {
@@ -48,14 +48,11 @@ class _GreetingData {
 
 class _PlaceholderData {
   static const List<String> _hints = [
-    'Frag mich was...',
-    'Was beschäftigt dich?',
-    'Erzähl mir davon...',
-    'Ich höre zu...',
-    'Was kann ich tun?',
-    'Schreib drauf los...',
-    'Dein nächster Schritt?',
-    'Lass uns planen...',
+    'Was moechtest du gerade schaffen?',
+    'Schreib 1-2 Saetze, ich mache Struktur daraus...',
+    'Was steht heute an? Ich mache dir einen Plan.',
+    'Beschreib das Problem kurz \u2013 wir sortieren es.',
+    'Womit willst du jetzt Klarheit gewinnen?',
   ];
 
   static String get() {
@@ -70,10 +67,14 @@ class _PlaceholderData {
 
 class NexiiaChatScreen extends StatefulWidget {
   final ValueChanged<bool>? onThreadToggled;
+  final String? initialPrompt;
+  final VoidCallback? onInitialPromptConsumed;
 
   const NexiiaChatScreen({
     super.key,
     this.onThreadToggled,
+    this.initialPrompt,
+    this.onInitialPromptConsumed,
   });
 
   @override
@@ -203,6 +204,15 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
     _placeholderCtrl.forward();
     _startPlaceholderLoop();
 
+    final initial = widget.initialPrompt?.trim();
+    if (initial != null && initial.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _createNewChat(initialPrompt: initial);
+        widget.onInitialPromptConsumed?.call();
+      });
+    }
+
     _msgController.addListener(() {
       if (mounted) setState(() {});
     });
@@ -218,6 +228,22 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
       });
       _startPlaceholderLoop();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant NexiiaChatScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final next = widget.initialPrompt?.trim();
+    final prev = oldWidget.initialPrompt?.trim();
+
+    if (next != null && next.isNotEmpty && next != prev) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _createNewChat(initialPrompt: next);
+        widget.onInitialPromptConsumed?.call();
+      });
+    }
   }
 
   @override
@@ -401,7 +427,7 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
     _msgController.clear();
     _scrollToBottom();
 
-    _nexiiaAI.sendMessage(trimmed).then((aiResponse) {
+    _nexiiaAI.sendMessage(trimmed).then((aiResponse) async {
       if (!mounted) return;
 
       final intent = _nexiiaAI.extractIntent(aiResponse);
@@ -446,11 +472,209 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
       });
 
       _scrollToBottom();
+      await _maybePromptForNameAfterAiReply(threadId);
     }).catchError((e) {
       debugPrint('❌ AI Fehler: $e');
       if (!mounted) return;
       setState(() => _isAiTyping = false);
     });
+  }
+
+  Future<void> _maybePromptForNameAfterAiReply(String threadId) async {
+    if (!mounted) return;
+    if (UserPreferences.hasUserName()) return;
+    if (UserPreferences.isNamePromptDismissed()) return;
+    if (UserPreferences.wasNamePromptShown()) return;
+
+    final idx = _threads.indexWhere((t) => t.id == threadId);
+    if (idx == -1) return;
+
+    final hasAi = _threads[idx].messages.any((m) => !m.isUser);
+    if (!hasAi) return;
+
+    await UserPreferences.markNamePromptShown();
+    if (!mounted) return;
+
+    final TextEditingController ctrl = TextEditingController();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (ctx) {
+        final safeBottom = MediaQuery.of(ctx).viewPadding.bottom;
+        final kb = MediaQuery.of(ctx).viewInsets.bottom;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: kb),
+          child: Container(
+            margin: EdgeInsets.fromLTRB(12, 0, 12, 12 + safeBottom),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 34, sigmaY: 34),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xCC0C0C14),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: AppColors.white10,
+                      width: 0.5,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x66000000),
+                        blurRadius: 30,
+                        offset: Offset(0, 14),
+                        spreadRadius: -12,
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 14),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2),
+                              color: AppColors.white15,
+                            ),
+                          ),
+                          const Text(
+                            'Wie darf ich dich nennen?',
+                            style: TextStyle(
+                              fontFamily: 'Satoshi',
+                              color: AppColors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: ctrl,
+                            textInputAction: TextInputAction.done,
+                            style: const TextStyle(
+                              fontFamily: 'Satoshi',
+                              color: AppColors.white95,
+                              fontSize: 15,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Optional',
+                              hintStyle: const TextStyle(
+                                fontFamily: 'Satoshi',
+                                color: AppColors.white30,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white.withValues(alpha: 0.06),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _sheetButton(
+                                  label: 'Ueberspringen',
+                                  isPrimary: false,
+                                  onTap: () async {
+                                    await UserPreferences.dismissNamePrompt();
+                                    if (ctx.mounted) Navigator.pop(ctx);
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _sheetButton(
+                                  label: 'Speichern',
+                                  isPrimary: true,
+                                  onTap: () async {
+                                    final name = ctrl.text.trim();
+                                    if (name.isNotEmpty) {
+                                      await UserPreferences.setUserName(name);
+                                      if (mounted) {
+                                        setState(() {
+                                          _userName = name;
+                                          _subtitle =
+                                              _GreetingData.getSubtitle(name);
+                                        });
+                                      }
+                                    }
+                                    if (ctx.mounted) Navigator.pop(ctx);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    ctrl.dispose();
+  }
+
+  Widget _sheetButton({
+    required String label,
+    required bool isPrimary,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 44,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          gradient: isPrimary
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    _priOp(0.60),
+                    _secOp(0.34),
+                  ],
+                )
+              : null,
+          color: isPrimary ? null : Colors.white.withValues(alpha: 0.06),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: isPrimary ? 0.10 : 0.12),
+            width: 0.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Satoshi',
+            color: isPrimary ? AppColors.white95 : AppColors.white80,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
   }
 
   void _handleIntent(Map<String, dynamic> intent) {
@@ -1482,13 +1706,12 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
           ),
           _menuItem(
             Icons.psychology_rounded,
-            'Therapie',
-            'Geführtes Gespräch',
+            'Reflexion',
+            'Gefuehrtes Gespraech',
             () {
               _closeAllMenus();
               _createNewChat(
-                initialPrompt:
-                    'Ich möchte ein therapeutisches Gespräch führen.',
+                initialPrompt: 'Ich moechte ein gefuehrtes Reflexionsgespraech.',
               );
             },
           ),
@@ -1496,7 +1719,7 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
           _menuItem(
             Icons.favorite_rounded,
             'SafeSpace',
-            'Sicherer Raum für dich',
+            'Ruhiger Raum fuer deine Gedanken',
             () {
               _closeAllMenus();
               _createNewChat(
@@ -1938,7 +2161,9 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
                     child: Column(
                       children: [
                         Text(
-                          '${_GreetingData.getTimePrefix()}, $_userName',
+                          _userName.isEmpty
+                              ? 'Hey, ich bin da.'
+                              : '${_GreetingData.getTimePrefix()}, $_userName',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: 'Satoshi',
@@ -1950,7 +2175,9 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _subtitle,
+                          _userName.isEmpty
+                              ? 'Moechtest du deinen Tag planen, ein Problem sortieren oder einfach kurz reden?'
+                              : _subtitle,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Satoshi',
@@ -2044,7 +2271,12 @@ class _NexiiaChatScreenState extends State<NexiiaChatScreen>
       child: ListView.builder(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(16, 8, 16, kbH > 0 ? 20 : 100),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          8,
+          16,
+          kbH > 0 ? 20 : (AppSpacing.navBarFootprint + 12),
+        ),
         itemCount: msgs.length + (_isAiTyping ? 1 : 0),
         itemBuilder: (_, i) {
           if (i == msgs.length && _isAiTyping) {

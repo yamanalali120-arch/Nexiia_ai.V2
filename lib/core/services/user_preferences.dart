@@ -23,6 +23,8 @@ class UserPreferences {
   static const String _keyUserName = 'nexiia_user_name';
   static const String _keyAtmosphereId = 'nexiia_atmosphere_id';
   static const String _keyOnboardingComplete = 'nexiia_onboarding_complete';
+  static const String _keyNamePromptDismissed = 'nexiia_name_prompt_dismissed';
+  static const String _keyNamePromptShown = 'nexiia_name_prompt_shown';
 
   // Feature-Intro Flags
   static const String _keySeenHomeIntro = 'nexiia_seen_home_intro';
@@ -63,6 +65,23 @@ class UserPreferences {
   static bool hasUserName() {
     final name = getUserName();
     return name.isNotEmpty;
+  }
+
+  // â”€â”€â”€ Optional Name Prompt â”€â”€â”€
+  static bool isNamePromptDismissed() {
+    return _safePrefs.getBool(_keyNamePromptDismissed) ?? false;
+  }
+
+  static Future<bool> dismissNamePrompt() {
+    return _safePrefs.setBool(_keyNamePromptDismissed, true);
+  }
+
+  static bool wasNamePromptShown() {
+    return _safePrefs.getBool(_keyNamePromptShown) ?? false;
+  }
+
+  static Future<bool> markNamePromptShown() {
+    return _safePrefs.setBool(_keyNamePromptShown, true);
   }
 
   // ─── Atmosphäre ──────────────────────────────────────────────
@@ -142,6 +161,8 @@ class UserPreferences {
     await _safePrefs.remove(_keyUserName);
     await _safePrefs.remove(_keyAtmosphereId);
     await _safePrefs.remove(_keyOnboardingComplete);
+    await _safePrefs.remove(_keyNamePromptDismissed);
+    await _safePrefs.remove(_keyNamePromptShown);
     await _safePrefs.remove(_keySeenHomeIntro);
     await _safePrefs.remove(_keySeenChatIntro);
     await _safePrefs.remove(_keySeenSolveIntro);

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/signup_screen.dart';
-import '../features/onboarding/greeting_screen.dart';
 import '../features/onboarding/name_input_screen.dart';
 import '../features/onboarding/atmosphere_screen.dart';
 import '../features/onboarding/intro_sequence_screen.dart';
 import '../features/onboarding/transition_screen.dart';
+import '../features/onboarding/goal_selection_screen.dart';
 import '../features/home/home_screen.dart';
 
 class AppRouter {
@@ -51,7 +51,8 @@ class AppRouter {
   // ═══════════════════════════════════════════
 
   static void startOnboarding(BuildContext context) {
-    replaceAllFade(context, const GreetingScreen());
+    // New onboarding start: immediate intent selection -> direct value.
+    replaceAllFade(context, const GoalSelectionScreen());
   }
 
   static void onboardingGreetingDone(BuildContext context) {

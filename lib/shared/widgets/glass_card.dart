@@ -253,7 +253,7 @@ class _GlassCardState extends State<GlassCard>
       top: 0,
       left: 0,
       right: 0,
-      height: 1,
+      height: 2,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
@@ -263,7 +263,7 @@ class _GlassCardState extends State<GlassCard>
           gradient: const LinearGradient(
             colors: [
               Color(0x00FFFFFF),
-              Color(0x26FFFFFF),
+              Color(0x18FFFFFF),
               Color(0x00FFFFFF),
             ],
           ),
