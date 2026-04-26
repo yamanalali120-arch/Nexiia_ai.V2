@@ -16,6 +16,10 @@ Ausgefuehrte Checks:
 - `flutter analyze` (keine neuen Errors; viele bestehende Infos/Deprecations bleiben)
 - `flutter build web --release` (OK)
 
+Deployment:
+- GitHub Push: Branch `codex-recovery-premium-stabilization` auf Repo `Nexiia_ai.V2`
+- Vercel Production Deploy (static, prebuilt `build/web`): `https://nexiia-ai-v2.vercel.app`
+
 ## 1. Kurzfassung
 
 Die App war durch einen committed Merge-Konflikt kaputt: mehrere Dart-Dateien enthielten echte `<<<<<<< HEAD` / `>>>>>>> ...` Marker. Zusätzlich wurde im letzten kaputten Commit eine komplette, falsche Duplikatstruktur unter `lib/lib/...` eingecheckt.
