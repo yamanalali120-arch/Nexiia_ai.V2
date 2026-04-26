@@ -19,9 +19,7 @@ import '../../shared/widgets/animated_gradient_bg.dart';
 import '../../navigation/app_router.dart';
 
 class AtmosphereScreen extends StatefulWidget {
-  final bool isFromSettings;
-
-  const AtmosphereScreen({super.key, this.isFromSettings = false});
+  const AtmosphereScreen({super.key});
 
   @override
   State<AtmosphereScreen> createState() => _AtmosphereScreenState();
@@ -126,10 +124,6 @@ class _AtmosphereScreenState extends State<AtmosphereScreen>
     if (!mounted) return;
     setState(() => _isSaving = false);
     Haptics.success();
-    if (widget.isFromSettings) {
-      Navigator.of(context).pop();
-      return;
-    }
     AppRouter.onboardingAtmosphereDone(context);
   }
 

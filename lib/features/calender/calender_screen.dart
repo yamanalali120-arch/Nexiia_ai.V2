@@ -2840,14 +2840,14 @@ class _EventSheetState extends State<_EventSheet>
                             left: 0,
                             right: 0,
                             child: Container(
-                              height: 2.0,
+                              height: 1.0,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
                                     Colors.transparent,
-                                    c.withOpacity(0.22),
-                                    Colors.white.withOpacity(0.28),
-                                    c.withOpacity(0.22),
+                                    c.withOpacity(0.40),
+                                    Colors.white.withOpacity(0.50),
+                                    c.withOpacity(0.40),
                                     Colors.transparent,
                                   ],
                                   stops: const [0.0, 0.15, 0.5, 0.85, 1.0],
@@ -3065,12 +3065,6 @@ class _EventSheetState extends State<_EventSheet>
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                              SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height:
-                                      16 + MediaQuery.of(ctx).viewPadding.bottom,
                                 ),
                               ),
                             ],

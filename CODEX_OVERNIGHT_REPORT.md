@@ -1,21 +1,5 @@
 # CODEX_OVERNIGHT_REPORT
 
-## Update (2026-04-26)
-
-Heute wurden der Onboarding-Flow und mehrere sichtbare UI/Glass-Bugs gezielt modernisiert, ohne alte Screens/Features zu loeschen:
-
-- Neuer Onboarding-Start: Intent-Auswahl (`GoalSelectionScreen`) und direkter Sprung in den passenden Bereich (Chat/Problem/Fokus).
-- Name-Abfrage: nicht mehr im Pflicht-Onboarding, sondern optional als Bottom-Sheet nach der ersten AI-Antwort im Chat (mit "Speichern" / "Ueberspringen").
-- Atmosphaere/Theme ist jetzt optional ueber Profil-Sheet: "Design anpassen" oeffnet `AtmosphereScreen` im Settings-Modus (speichern und zurueck).
-- Home Empty State (0 Aufgaben/0 Erledigt) wirkt jetzt fertig: neue Headline/Copy + Buttons "Tag planen" (inkl. Prompt) und "Problem loesen".
-- BottomNav/Labels: "Loesen" -> "Problem", "Kalender" -> "Planer" (konsistenter).
-- Glass/Sheets: Safe-Area unten sauberer (Profile Sheet), Chat Content bekommt Bottom-Padding gegen Nav-Overlap, 1px-Specular-Linien reduziert (GlassCard + Calendar Event Sheet).
-
-Ausgefuehrte Checks:
-- `flutter pub get` (OK)
-- `flutter analyze` (keine neuen Errors; viele bestehende Infos/Deprecations bleiben)
-- `flutter build web --release` (OK)
-
 ## 1. Kurzfassung
 
 Die App war durch einen committed Merge-Konflikt kaputt: mehrere Dart-Dateien enthielten echte `<<<<<<< HEAD` / `>>>>>>> ...` Marker. Zusätzlich wurde im letzten kaputten Commit eine komplette, falsche Duplikatstruktur unter `lib/lib/...` eingecheckt.
