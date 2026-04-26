@@ -1,5 +1,5 @@
 {
-  "buildCommand": "chmod +x build.sh && ./build.sh",
+  "buildCommand": "sh ./build.sh",
   "outputDirectory": "build/web",
   "rewrites": [
     {
