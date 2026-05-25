@@ -700,22 +700,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //  HOME TAB
   // ════════════════════════════════════════════════════
 
-  String _getDynamicSubtitle() {
-    final h = DateTime.now().hour;
-    final subs = <String>[
-      'Was steht heute an?',
-      'Bereit für den Tag?',
-      'Was beschäftigt dich?',
-      'Wie kann ich helfen?',
-      'Worauf liegt dein Fokus?',
-      'Lass uns loslegen',
-      'Was brauchst du gerade?',
-      'Neuer Tag, neue Energie',
-      'Was möchtest du erreichen?',
-    ];
-    final seed = h * 7 + _userName.hashCode;
-    return subs[seed.abs() % subs.length];
-  }
+String _getDynamicSubtitle() {
+  return 'Dein KI-Companion für Chat, Planung und smarte Aufgaben.';
+}
 
   Widget _buildHomeTab() {
     final double tp = MediaQuery.of(context).padding.top;
@@ -1226,7 +1213,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 18),
           const Text(
-            'Starte einen Chat um deinen Tag zu planen und Aufgaben zu organisieren.',
+            'Nexiia hilft dir, Gedanken zu sortieren, Aufgaben zu planen und schneller ins Handeln zu kommen.',
             style: TextStyle(
               fontFamily: 'Satoshi',
               color: AppColors.white40,
@@ -1401,7 +1388,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Icon(Icons.bolt_rounded, color: Colors.white, size: 17),
                 SizedBox(width: 8),
                 Text(
-                  'Chat starten',
+                  'Mit Nexiia starten',
                   style: TextStyle(
                     fontFamily: 'Satoshi',
                     color: Colors.white,
@@ -1494,7 +1481,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Nexiia Companion',
+                  'Online • Bereit für dich',
                   style: TextStyle(
                     fontFamily: 'Satoshi',
                     color: AppColors.white80,
@@ -1533,7 +1520,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(width: 6),
                     const Text(
-                      'Online • Bereit für dich',
+                      'Bereit für Chat, Planung & Fokus',
                       style: TextStyle(
                         fontFamily: 'Satoshi',
                         color: AppColors.white30,
