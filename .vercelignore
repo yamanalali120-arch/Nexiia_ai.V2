@@ -1,5 +1,8 @@
-*
-!build/
-!build/web/
-!build/web/**
-!vercel.json
+.env
+.env.*
+.git
+.github
+README.md
+CODEX_OVERNIGHT_REPORT.md
+flutter_*.log
+flutter_*.png
