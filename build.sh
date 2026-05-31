@@ -12,6 +12,15 @@ echo ">>> Flutter version:"
 flutter --version
 
 flutter config --enable-web
+
+# Create placeholder .env if missing (listed as asset in pubspec.yaml,
+# but not committed to git since it contains secrets).
+# Vercel env vars should be configured in the Vercel Dashboard.
+if [ ! -f ".env" ]; then
+  echo ">>> Creating placeholder .env for Flutter asset bundling..."
+  touch .env
+fi
+
 flutter pub get
 flutter build web --release
 
